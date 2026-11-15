@@ -438,51 +438,88 @@ function spellParts(y){return expectedParts(y).map(p=>p.t)}
 /* ---- Chấm bài đánh vần từ chữ máy nghe được ---- */
 const stripTone=s=>splitTone(s).base;
 const stripAll=s=>s.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/đ/g,'d');
+// khoảng cách sửa chữ (Levenshtein)
+function lev(a,b){if(a===b)return 0;const m=a.length,n=b.length;if(!m||!n)return m||n;let prev=[...Array(n+1).keys()];
+  for(let i=1;i<=m;i++){const cur=[i];for(let j=1;j<=n;j++)cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));prev=cur}return prev[n]}
+// máy nghe hay viết tên âm đầu thành chữ gần âm
+const ONSET_ALIAS={d:['gio','do','de','di','zo'],gi:['di','gi','zi','ri','gio'],k:['ca','ka','co','cơ'],c:['co','ke','ka','cu'],q:['quo','cu','qua'],qu:['quo','cu','qua','quơ','co'],r:['ro','zo','do'],g:['go','ghe','gơ'],gh:['go','ghe','gơ'],ng:['ngo','ngơ'],ngh:['ngo','ngơ'],nh:['nho','nhơ'],h:['ho','hơ'],x:['xo','so'],s:['so','xo','sơ']};
+const TONE_NAMES_PLAIN=['sac','huyen','hoi','nga','nang'];
 function tokScore(e,tok){
   if(tok===e.t)return 1;
   const a=stripAll(tok),b=stripAll(e.t);
-  if(e.k==='onset'){const o=stripAll(e.o);if(a===b||a===o||(a.startsWith(o)&&a.length<=o.length+1&&/[oe]$/.test(a)))return .9;return 0}
-  if(e.k==='tone')return a===b||(TONE_ALIAS[e.t]||[]).includes(tok)?.9:0;
+  if(e.k==='onset'){const o=stripAll(e.o);
+    if(a===b||a===o||(a.startsWith(o)&&a.length<=o.length+1&&/[oeu]$/.test(a))||(ONSET_ALIAS[e.o]||[]).map(stripAll).includes(a))return .9;
+    // máy nghe nhầm âm đầu gần giống (bờ → vờ, pờ...)
+    if(a.length<=3&&/[oe]$/.test(a)&&(ONSET_SIM[e.o]||[]).some(x=>a===stripAll(x)+'o'))return .5;
+    return 0}
+  if(e.k==='tone'){if(a===b||(TONE_ALIAS[e.t]||[]).includes(tok))return .9;
+    if(TONE_NAMES_PLAIN.includes(a))return 0; // nói nhầm sang dấu khác
+    return a.length>=2&&lev(a,b)<=1?.7:0}
   if(stripTone(tok)===stripTone(e.t))return e.k==='word'?.5:.8;
-  if(a===b)return e.k==='word'?.3:.6;
+  if(a===b)return e.k==='word'?.4:.6;
+  if(e.k!=='word'&&b.length>=2&&lev(stripTone(tok),stripTone(e.t))<=1&&a[0]===b[0])return .4;
   return 0}
 // máy nghe hay viết nhầm tên dấu thành từ gần âm
-const TONE_ALIAS={'sắc':['sắt','sát','sắp','xắc','sạc','sách','sác'],'huyền':['huyện','uyền','huyên','quyền','huyển'],'hỏi':['hội','hơi','hói','hổi','hởi'],'ngã':['ngả','ngà','nga','ngạ'],'nặng':['nắng','nạn','nặn','năng','nặn']};
+const TONE_ALIAS={'sắc':['sắt','sát','sắp','xắc','sạc','sách','sác','xác','sấc','sất','sặc','sạch','sát'],'huyền':['huyện','uyền','huyên','quyền','huyển','truyền','khuyên','uyên','chuyền','huyễn'],'hỏi':['hội','hơi','hói','hổi','hởi','hồi','hối','hỗi','hoi','hời'],'ngã':['ngả','ngà','nga','ngạ','ngá','ngại','ngựa'],'nặng':['nắng','nạn','nặn','năng','nằng','lặng','nậng','nàng','nẵng']};
 // Đổi chữ máy nghe được thành các tiếng: "a3" → "a ba", "10" → "mười"
 function speechTokens(text){
   return String(text).toLowerCase().normalize('NFC').replace(/(\d+)/g,' $1 ').split(/[^\p{L}\d]+/u).filter(Boolean)
     .flatMap(t=>/^\d+$/.test(t)?(+t<=99?numVi(+t).split(' '):t.split('').map(d=>DIG[+d])):[t])}
 function scoreSpell(y,text){
   const toks=speechTokens(text);
-  const exp=expectedParts(y);let i=0,sum=0,word=0,tone=y.tone==='ngang'?1:0;const hit=[];
-  for(const e of exp){let best=0,bj=-1;for(let j=i;j<Math.min(toks.length,i+4);j++){const s=tokScore(e,toks[j]);if(s>best){best=s;bj=j}if(s===1)break}
-    if(bj>=0){i=bj+1;sum+=best}hit.push(best);if(e.k==='word')word=best;if(e.k==='tone')tone=best}
-  if(word<1&&toks.includes(y.word))word=1;
+  const exp=expectedParts(y),n=exp.length,m=toks.length;let word=0,tone=y.tone==='ngang'?1:0;
+  // ghép từng phần với chữ máy nghe theo thứ tự, chọn cách ghép được điểm cao nhất (cho phép thiếu/thừa chữ)
+  const dp=Array.from({length:n+1},()=>new Array(m+1).fill(0)),bk=Array.from({length:n+1},()=>new Array(m+1).fill(0));
+  for(let i=1;i<=n;i++)for(let j=0;j<=m;j++){let v=dp[i-1][j],w=0;
+    if(j>0){if(dp[i][j-1]>v){v=dp[i][j-1];w=1}const sc=dp[i-1][j-1]+tokScore(exp[i-1],toks[j-1]);if(sc>v){v=sc;w=2}}
+    dp[i][j]=v;bk[i][j]=w}
+  const hit=new Array(n).fill(0);for(let i=n,j=m;i>0;){const w=bk[i][j];if(w===2){hit[i-1]=tokScore(exp[i-1],toks[j-1]);i--;j--}else if(w===1)j--;else i--}
+  exp.forEach((e,i)=>{if(e.k==='word')word=hit[i];if(e.k==='tone')tone=hit[i]});const sum=dp[n][m];
+  if(word<1&&toks.slice(-3).includes(y.word))word=1;
+  // máy hay ghi tiếng cuối sai dấu nhưng tên dấu thì nghe đúng → coi như đọc đúng chữ
+  if(word<.5&&tone>=.7&&toks.slice(-2).some(t=>stripAll(t)===stripAll(y.word)))word=.5;
   return{score:exp.length?sum/exp.length:0,word,tone,hit,n:toks.length}}
-const STRICT={de:{score:.45,word:.3,tone:0},vua:{score:.6,word:.5,tone:.9},kho:{score:.8,word:1,tone:.9}};
-function passSpell(y,texts){let best={score:0,word:0,tone:0};for(const t of texts){if(!t)continue;const r=scoreSpell(y,t);if(r.score+r.word+r.tone>best.score+best.word+best.tone)best=r}
-  const th=STRICT[S.settings.strict]||STRICT.vua;
-  return{ok:best.score>=th.score&&best.word>=th.word&&best.tone>=th.tone,best}}
+const STRICT={de:{score:.4,word:.3,tone:0},vua:{score:.55,word:.4,tone:.7},kho:{score:.8,word:1,tone:.9}};
+function passSpell(y,texts){let best={score:0,word:0,tone:0};const th=STRICT[S.settings.strict]||STRICT.vua;
+  for(const t of texts){if(!t)continue;const r=scoreSpell(y,t);const ok=r.score>=th.score&&r.word>=th.word&&r.tone>=th.tone;
+    if(ok)return{ok:true,best:r,text:t};if(r.score+r.word+r.tone>best.score+best.word+best.tone)best=r}
+  return{ok:false,best}}
 
-/* ---- Nghe giọng nói (Web Speech API) ---- */
+/* ---- Nghe giọng nói (Web Speech API) ----
+   iPad hay tự ngắt khi bé ngập ngừng giữa các phần → tự nghe tiếp và nối chữ lại.
+   Giữ mọi bản máy nghe được (kể cả bản tạm) vì máy hay "sửa" bản cuối thành chữ sai. */
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
 const micReady=()=>!!SR&&window.isSecureContext;
 let recStop=null;
 function stopRec(){if(recStop){const f=recStop;recStop=null;f(true)}}
-function listen({onInterim,onDone,onError,maxMs=10000,silenceMs=2300}){
-  stopRec();let r;try{r=new SR()}catch(e){onError('start');return}
-  r.lang='vi-VN';r.continuous=true;r.interimResults=true;r.maxAlternatives=3;
-  let finals=[],interim='',alts=[],done=false,stopping=false,silT=0,maxT=0,endT=0,aborted=false;
-  const collect=e=>{finals=[];interim='';alts=[];for(let i=0;i<e.results.length;i++){const res=e.results[i];if(res.isFinal){finals.push(res[0].transcript);for(let a=1;a<res.length;a++)alts.push(res[a].transcript)}else interim+=res[0].transcript+' '}};
-  const finish=()=>{if(done)return;done=true;clearTimeout(silT);clearTimeout(maxT);clearTimeout(endT);recStop=null;if(aborted)return;
-    const text=(finals.join(' ')+' '+interim).replace(/\s+/g,' ').trim();onDone(text,alts.map(a=>(finals.slice(0,-1).join(' ')+' '+a).trim()))};
-  const requestStop=(abort)=>{if(abort)aborted=true;if(stopping)return;stopping=true;try{abort?r.abort():r.stop()}catch(e){}endT=setTimeout(finish,1300)};
+function listen({onInterim,onDone,onError,onStart,isGood,maxMs=12000,silenceMs=2600}){
+  stopRec();
+  let r=null,prefix='',finals=[],interim='',done=false,stopping=false,aborted=false,heard=false,silT=0,maxT=0,endT=0;
+  const snaps=new Set(),t0=Date.now();
+  const cur=()=>(prefix+' '+finals.join(' ')+' '+interim).replace(/\s+/g,' ').trim();
+  const clearAll=()=>{clearTimeout(silT);clearTimeout(maxT);clearTimeout(endT);recStop=null};
+  const finish=()=>{if(done)return;done=true;clearAll();if(aborted)return;const text=cur();if(text)snaps.add(text);onDone(text,[...snaps].reverse())};
+  const requestStop=abort=>{if(abort)aborted=true;if(stopping&&!abort)return;stopping=true;try{abort?r.abort():r.stop()}catch(e){}clearTimeout(endT);endT=setTimeout(finish,1300)};
   recStop=requestStop;
-  r.onresult=e=>{collect(e);onInterim&&onInterim((finals.join(' ')+' '+interim).trim());clearTimeout(silT);silT=setTimeout(()=>requestStop(),silenceMs)};
-  r.onerror=e=>{if(done)return;if(e.error==='no-speech'||e.error==='aborted'){finish();return}done=true;clearTimeout(silT);clearTimeout(maxT);recStop=null;if(!aborted)onError(e.error)};
-  r.onend=finish;
+  function startOne(){
+    try{r=new SR()}catch(e){if(heard)finish();else{done=true;clearAll();onError('start')}return}
+    r.lang='vi-VN';r.continuous=true;r.interimResults=true;r.maxAlternatives=5;finals=[];interim='';
+    r.onstart=()=>{onStart&&onStart()};
+    r.onresult=e=>{heard=true;finals=[];interim='';const pre=prefix;
+      for(let i=0;i<e.results.length;i++){const res=e.results[i];
+        if(res.isFinal){finals.push(res[0].transcript);for(let k=1;k<res.length;k++)snaps.add((pre+' '+finals.slice(0,-1).join(' ')+' '+res[k].transcript).replace(/\s+/g,' ').trim())}
+        else interim+=res[0].transcript+' '}
+      const t=cur();if(t)snaps.add(t);onInterim&&onInterim(t);
+      clearTimeout(silT);silT=setTimeout(()=>requestStop(),isGood&&isGood(t)?900:silenceMs)};
+    r.onerror=e=>{if(done)return;if(['no-speech','aborted','network','audio-capture'].includes(e.error)&&(heard||e.error!=='audio-capture'))return;
+      if(e.error==='not-allowed'||e.error==='service-not-allowed'||!heard){done=true;clearAll();if(!aborted)onError(e.error)}};
+    r.onend=()=>{if(done)return;
+      if(!stopping&&Date.now()-t0<maxMs-700){prefix=cur();setTimeout(()=>{if(!done&&!stopping)startOne()},60);return}
+      finish()};
+    try{r.start()}catch(e){if(heard)finish();else{done=true;clearAll();onError('start')}}
+  }
   maxT=setTimeout(()=>requestStop(),maxMs);
-  try{r.start()}catch(e){done=true;recStop=null;onError('start')}
+  startOne();
 }
 function spellText(y){return spellParts(y).join(' – ')}
 function rimeVariants(r){const out=new Set();
@@ -699,7 +736,7 @@ function renderSpeak(q){
   const ans=$('#answers');ans.className='answers one';
   ans.innerHTML=`<button class="abtn wide mic" id="micBtn">🎤 Bé đánh vần</button><button class="link" id="parentOk">👍 Bố mẹ chấm: bé đọc đúng</button>`;
   $('#micBtn').onclick=()=>{if(q.listening)stopRec2(q);else startListen(q)};
-  $('#parentOk').onclick=()=>{if(q.done)return;stopRec();q.done=true;sfx.ok();$('#readHint').textContent=spellText(y);finishQ(q,'')};
+  $('#parentOk').onclick=()=>{if(q.done)return;stopRec();q.done=true;q.mistakes=Math.max(0,q.mistakes-(q.micFails||0));sfx.ok();$('#readHint').textContent=spellText(y);finishQ(q,'')};
   fb('');
   sayQueue(['Bé đánh vần nhé'],()=>{if(R&&R.qs[R.i]===q&&$('#quiz').classList.contains('active'))startListen(q)});
 }
@@ -709,15 +746,18 @@ function micUi(q,state){const b=$('#micBtn');if(!b)return;q.listening=state==='l
 function startListen(q){
   if(q.done)return;stopSpeech();
   sfx.tit();
-  $('#micStatus').textContent='🎙️ Đang nghe bé đánh vần…';$('#heard').textContent='';micUi(q,'listen');
+  $('#micStatus').textContent='⏳ Chờ chút…';$('#heard').textContent='';micUi(q,'listen');
   setTimeout(()=>listen({
+    onStart:()=>{const m=$('#micStatus');if(m&&!q.done)m.textContent='🎙️ Bé đánh vần đi!'},
+    isGood:t=>passSpell(q.y,[t]).ok,
     onInterim:t=>{const h=$('#heard');if(h)h.textContent='“'+t+'”'},
     onDone:(text,alts)=>{if(q.done||!$('#micBtn'))return;micUi(q,'idle');q.heardOnce=true;
       if(!text){$('#micStatus').textContent='Máy chưa nghe thấy gì 🙉';fb('Bé nói to hơn một chút nhé, rồi bấm 🎤','var(--orange)');say(P.louder);return}
       $('#heard').textContent='Máy nghe được: “'+text+'”';
       const r=passSpell(q.y,[text,...alts]);
+      if(r.ok&&r.text&&r.text!==text)$('#heard').textContent='Máy nghe được: “'+r.text+'”';
       if(r.ok){q.done=true;$('#micStatus').textContent='🎉 Bé đánh vần đúng rồi!';$('#readHint').textContent=spellText(q.y);sfx.ok();finishQ(q,'')}
-      else{q.mistakes++;sfx.no();$('#spk').style.display='';
+      else{q.mistakes++;q.micFails=(q.micFails||0)+1;sfx.no();$('#spk').style.display='';const po=$('#parentOk');if(po)po.textContent='👍 Bé đọc đúng mà máy nghe nhầm → bố mẹ bấm đây';
         const whole=r.best.word>=.5&&r.best.score<.45;
         $('#micStatus').textContent=whole?'Bé mới đọc cả chữ, chưa đánh vần từng phần':'Chưa đúng rồi';
         fb(q.mistakes>=2?'Bé nghe mẫu rồi đánh vần lại nhé!':'Bé thử đánh vần lại nhé! 💪','#c44');
