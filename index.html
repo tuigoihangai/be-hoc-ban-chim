@@ -31,7 +31,15 @@ h2{margin:8px 0 14px;font-size:clamp(24px,5vw,36px);text-align:center}
 /* HOME */
 #home{justify-content:center;background:linear-gradient(#9fd8ff,#e9f8ff 60%,#fff8e7)}
 .title{font-size:clamp(40px,10vw,76px);font-weight:900;text-align:center;line-height:1.02;color:#fff;text-shadow:0 4px 0 #2b7fd1,0 8px 14px rgba(0,0,0,.18);margin-bottom:4px}
-#homeCv{width:min(90vw,460px);height:120px}
+#homeCv{width:min(90vw,460px);height:110px}
+.hello{font-size:clamp(22px,5.5vw,34px);font-weight:800;color:#2b5d8a;text-align:center}
+.hello b{color:var(--orange)}
+.ask{font-size:clamp(20px,4.8vw,28px);font-weight:800;color:var(--ink);text-align:center;margin-bottom:4px}
+.splash{position:fixed;inset:0;z-index:200;background:linear-gradient(#8fd2ff,#e9f8ff);display:flex;align-items:center;justify-content:center;padding:16px}
+.splash.hide{display:none}
+.splash-in{text-align:center}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
+.title{animation:none}
 .ammo-big{font-size:clamp(22px,5vw,30px);font-weight:800;background:#fff;border-radius:999px;padding:8px 22px;box-shadow:0 4px 0 rgba(0,0,0,.1);margin:6px 0 8px}
 .gear{position:absolute;right:calc(env(safe-area-inset-right) + 12px);top:calc(env(safe-area-inset-top) + 10px);width:50px;height:50px;border-radius:50%;border:none;background:rgba(255,255,255,.7);font-size:24px}
 .small{color:var(--muted);font-size:16px;margin-top:6px;text-align:center}
@@ -132,12 +140,19 @@ td,th{padding:6px;border-bottom:1px solid #eee;text-align:center}
 <!-- HOME -->
 <section id="home" class="screen active">
   <button class="gear" id="btnParent" aria-label="Góc bố mẹ">⚙️</button>
+  <div class="hello">Xin chào <b id="helloNames">Haha và Hihi</b> 👋</div>
   <div class="title">Bé Học<br>Bắn Chim</div>
   <canvas id="homeCv"></canvas>
+  <div class="ask">Hôm nay hai bé muốn làm gì?</div>
   <div class="ammo-big">🎯 <b id="homeAmmo">0</b> viên đạn</div>
   <button class="big-btn green" data-go="learnMenu">📚 Học lấy đạn</button>
   <button class="big-btn orange" id="btnShoot">🐦 Đi bắn chim</button>
   <div class="small" id="homeStat"></div>
+  <div class="splash" id="splash"><div class="splash-in">
+    <div style="font-size:90px;animation:bounce 1.2s infinite">🐦</div>
+    <div class="title" style="font-size:clamp(34px,9vw,60px)">Bé Học Bắn Chim</div>
+    <button class="big-btn orange" id="splashGo">👆 Chạm để bắt đầu</button>
+  </div></div>
 </section>
 
 <!-- LEARN MENU -->
@@ -178,7 +193,7 @@ td,th{padding:6px;border-bottom:1px solid #eee;text-align:center}
 <section id="shoot" class="screen">
   <canvas id="cv"></canvas>
   <button class="back" id="shootBack">⬅</button>
-  <div class="hud"><div class="pill">🎯 <b id="hudAmmo">0</b></div><div class="pill">🐦 <b id="hudBirds">0</b></div></div>
+  <div class="hud"><button class="pill" id="musicBtn" style="border:none">🎵</button><div class="pill">🎯 <b id="hudAmmo">0</b></div><div class="pill">🐦 <b id="hudBirds">0</b></div></div>
   <div class="overlay" id="noAmmo"><div class="ov-card">
     <div style="font-size:72px">😮</div>
     <h2>Hết đạn rồi!</h2>
@@ -221,6 +236,7 @@ td,th{padding:6px;border-bottom:1px solid #eee;text-align:center}
 
   <div class="panel">
     <h3>⚙️ Cài đặt</h3>
+    <label class="row">Tên các bé (game chào) <input type="text" id="setNames" style="max-width:280px" placeholder="Haha và Hihi"></label>
     <label class="row">Số đạn cho mỗi câu đúng ngay lần đầu
       <select id="setPer"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label>
     <div class="hint">Sai 1 lần rồi mới đúng: được một nửa. Sai từ 2 lần: không có đạn (game sẽ chỉ đáp án).</div>
@@ -284,7 +300,7 @@ const KEY='behocbanchim_v1';
 const DEFAULT_WORDS='bố, mẹ, bà, ông, em, bé, chị, anh, cá, gà, bò, dê, chó, mèo, nhà, xe, hoa, lá, cờ, vở';
 const DEFAULT={
   bullets:5, birdsTotal:0,
-  settings:{perCorrect:2,roundLen:10,maxNum:10,math:{add:true,sub:true,cmp:true,cmp2:true,miss:false},showPics:true,spellMode:'noi',strict:'vua',showWord:true,rate:0.8},
+  settings:{perCorrect:2,roundLen:10,maxNum:10,math:{add:true,sub:true,cmp:true,cmp2:true,miss:false},showPics:true,spellMode:'noi',strict:'vua',names:'Haha và Hihi',showWord:true,rate:0.8},
   lessons:[
     {id:'giadinh',name:'Gia đình & con vật (mẫu)',type:'spell',active:true,items:DEFAULT_WORDS.split(/,\s*/)},
     {id:'toanmau',name:'Toán mẫu (có thể xoá)',type:'math',active:false,items:['3 + 4','8 - 5','6 ? 9','2 + 3 ? 1 + 4','4 + ? = 7']}
@@ -302,38 +318,84 @@ function day(){const k=todayKey();return S.stats.days[k]||(S.stats.days[k]={righ
 /* ================= ÂM THANH ================= */
 let AC=null;
 function ac(){try{if(!AC)AC=new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume()}catch(e){}return AC}
-function beep(freq,dur,type='sine',vol=.2,slide=0,delay=0){const c=ac();if(!c)return;const t=c.currentTime+delay;const o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(freq,t);if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(40,freq+slide),t+dur);g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+dur+.02)}
+let MASTER=null;
+function out(){const c=ac();if(!MASTER){MASTER=c.createGain();MASTER.gain.value=.9;MASTER.connect(c.destination)}return MASTER}
+function beep(freq,dur,type='sine',vol=.2,slide=0,delay=0,attack=.005){const c=ac();if(!c)return;const t=c.currentTime+delay;const o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(freq,t);if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(40,freq+slide),t+dur);g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(vol,t+attack);g.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(g);g.connect(out());o.start(t);o.stop(t+dur+.02)}
+let NOISE=null;
+function noise(dur,vol=.15,f1=800,f2=3000,delay=0,q=1){const c=ac();if(!c)return;if(!NOISE){NOISE=c.createBuffer(1,c.sampleRate,c.sampleRate);const d=NOISE.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1}
+  const t=c.currentTime+delay,s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain();s.buffer=NOISE;f.type='bandpass';f.Q.value=q;f.frequency.setValueAtTime(f1,t);f.frequency.exponentialRampToValueAtTime(f2,t+dur);
+  g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);s.connect(f);f.connect(g);g.connect(out());s.start(t);s.stop(t+dur+.02)}
+// tiếng chim hót: vài nốt vút nhanh ở tần số cao
+function chirp(vol=.07,delay=0,n=0){const c=ac();if(!c)return;n=n||rnd(2,4);let t=delay;const base=rnd(2200,3200);
+  for(let i=0;i<n;i++){const f=base+rnd(-300,600);beep(f,.07,'sine',vol,rnd(600,1400)*(Math.random()<.5?1:-1),t,.003);t+=.09+Math.random()*.05}}
 const sfx={
-  ok(){beep(660,.12,'sine',.22);beep(880,.2,'sine',.22,0,.11);beep(1320,.25,'sine',.12,0,.22)},
-  no(){beep(260,.25,'triangle',.18,-120)},
-  tap(){beep(520,.05,'sine',.1)},
-  shoot(){beep(700,.14,'square',.05,-500)},
-  pop(){beep(500,.12,'sine',.25,900);beep(1200,.12,'triangle',.1,0,.06)},
-  miss(){beep(180,.1,'sine',.08,-60)},
-  coin(){beep(988,.08,'square',.06);beep(1319,.18,'square',.06,0,.08)}
+  tap(){beep(420,.09,'sine',.18,700,0,.003)},                                   // bóp bong bóng
+  ok(){[523,659,784,1047].forEach((f,i)=>{beep(f,.22,'triangle',.18,0,i*.09);beep(f*2,.15,'sine',.05,0,i*.09)})},  // đô-mi-son-đô
+  no(){beep(330,.18,'sine',.2,-90,0,.01);beep(250,.28,'sine',.18,-60,.16,.01)},  // "ừ-ừm" nhẹ nhàng
+  coin(){beep(988,.08,'square',.05);beep(1319,.25,'square',.05,0,.08);beep(2637,.2,'sine',.04,0,.08)},
+  whoosh(){noise(.35,.12,400,2500,0,.8)},
+  tit(){beep(1046,.2,'sine',.32,0,0,.004)},
+  shoot(){beep(170,.18,'triangle',.3,-90,0,.002);noise(.22,.18,1500,500,.02,1.2)}, // tưng của ná + vút
+  hit(){beep(2600,.08,'sine',.16,-1200,0,.002);beep(2400,.1,'sine',.14,-1300,.1,.002);  // "chíp chíp!"
+    beep(500,.1,'sine',.25,900,.02);noise(.18,.1,3000,6000,.02,2);
+    [1568,2093,2637].forEach((f,i)=>beep(f,.18,'sine',.06,0,.18+i*.06))},
+  miss(){noise(.2,.08,600,200,0,1)},
+  fanfare(){[[523,0],[659,.12],[784,.24],[1047,.36],[784,.52],[1047,.64]].forEach(([f,t])=>{beep(f,.25,'triangle',.18,0,t);beep(f/2,.25,'sine',.08,0,t)})},
+  pop(){beep(600,.1,'sine',.2,800)}
 };
+// Nhạc nền vui khi bắn chim (tự tạo, không cần file)
+const MUSIC={on:S.settings.music!==false,timer:0,step:0};
+const MEL=[72,0,76,79,76,0,72,74,76,0,74,72,69,0,72,0, 74,0,77,81,79,0,77,76,74,0,76,77,79,0,0,0];
+const BASS=[48,55,52,55,45,52,48,55,50,57,53,57,43,50,48,55];
+function midi(n){return 440*Math.pow(2,(n-69)/12)}
+function musicStart(){if(!MUSIC.on||MUSIC.timer)return;const c=ac();if(!c)return;MUSIC.step=0;
+  MUSIC.timer=setInterval(()=>{const i=MUSIC.step++%MEL.length;const m=MEL[i];if(m)beep(midi(m),.22,'triangle',.045,0,0,.01);if(i%2===0)beep(midi(BASS[(i/2)%BASS.length]),.3,'sine',.05,0,0,.01)},190)}
+function musicStop(){clearInterval(MUSIC.timer);MUSIC.timer=0}
 
-/* ================= GIỌNG ĐỌC TIẾNG VIỆT ================= */
+/* ================= GIỌNG ĐỌC TIẾNG VIỆT =================
+   1) File thu sẵn trong audio/ (giọng chuẩn)  2) Có mạng: đọc online  3) Giọng có sẵn của máy (chỉ khi là giọng Việt) */
 const hasTTS='speechSynthesis' in window;
 let viVoice=null;
 function pickVoice(){if(!hasTTS)return;const vs=speechSynthesis.getVoices();viVoice=vs.find(v=>/^vi/i.test(v.lang)&&/linh|an|female|nữ/i.test(v.name))||vs.find(v=>/^vi/i.test(v.lang))||null}
 if(hasTTS){pickVoice();speechSynthesis.onvoiceschanged=pickVoice}
-// Chỉ đọc khi máy có giọng tiếng Việt — không có thì im lặng (tránh trình duyệt đọc bằng giọng tiếng Anh)
 function canSpeak(){if(!hasTTS)return false;if(!viVoice)pickVoice();return!!viVoice}
 function mkU(text){const u=new SpeechSynthesisUtterance(text);u.lang='vi-VN';if(viVoice)u.voice=viVoice;u.rate=S.settings.rate;u.pitch=1.1;return u}
-let sayToken=0;
-function say(text){if(!canSpeak())return;sayToken++;speechSynthesis.cancel();setTimeout(()=>speechSynthesis.speak(mkU(text)),40)}
-function sayQueue(parts,done){
-  const my=++sayToken;
-  if(!canSpeak()){if(done)setTimeout(()=>{if(my===sayToken)done()},500);return}
-  speechSynthesis.cancel();let i=0;
-  const next=()=>{if(my!==sayToken)return;if(i>=parts.length){if(done)done();return}
-    const u=mkU(parts[i++]);let fired=false;const go=()=>{if(fired)return;fired=true;setTimeout(next,180)};
-    u.onend=go;u.onerror=go;setTimeout(go,2600);speechSynthesis.speak(u)};
-  setTimeout(next,60);
-}
+const nk=t=>String(t).toLowerCase().normalize('NFC').replace(/[.,!?…“”"':;()]/g,' ').replace(/\s+/g,' ').trim();
+let AUDIO_IDX={};
+fetch('audio/index.json').then(r=>r.ok?r.json():{}).then(j=>{AUDIO_IDX=j}).catch(()=>{});
+const bufCache={};
+function loadBuf(file){if(bufCache[file])return bufCache[file];
+  return bufCache[file]=fetch('audio/'+file).then(r=>{if(!r.ok)throw new Error('404');return r.arrayBuffer()})
+    .then(ab=>new Promise((res,rej)=>ac().decodeAudioData(ab,res,rej))).catch(e=>{delete bufCache[file];throw e})}
+const onlineAudio=new Audio();onlineAudio.preload='auto';
+let curSrc=null,sayToken=0;
+function stopSpeech(){sayToken++;try{curSrc&&curSrc.stop()}catch(e){}curSrc=null;try{onlineAudio.pause()}catch(e){}if(hasTTS)speechSynthesis.cancel()}
+function playOne(text,my){return new Promise(res=>{
+  const k=nk(text);if(!k)return res();
+  const device=()=>{if(my!==sayToken||!canSpeak())return setTimeout(res,250);const u=mkU(text);let f=false;const go=()=>{if(f)return;f=true;res()};u.onend=go;u.onerror=go;setTimeout(go,3500);speechSynthesis.speak(u)};
+  const online=()=>{if(navigator.onLine===false)return device();let f=false;const fin=ok=>{if(f)return;f=true;clearTimeout(tm);onlineAudio.onended=onlineAudio.onerror=null;ok?res():device()};
+    onlineAudio.onended=()=>fin(true);onlineAudio.onerror=()=>fin(false);
+    onlineAudio.src='https://translate.google.com/translate_tts?ie=UTF-8&tl=vi&client=tw-ob&q='+encodeURIComponent(k);
+    const p=onlineAudio.play();if(p&&p.catch)p.catch(()=>fin(false));const tm=setTimeout(()=>fin(true),9000)};
+  const f=AUDIO_IDX[k];
+  if(f)loadBuf(f).then(buf=>{if(my!==sayToken)return res();const c=ac(),s=c.createBufferSource();s.buffer=buf;s.connect(out());curSrc=s;
+      let d=false;const go=()=>{if(d)return;d=true;if(curSrc===s)curSrc=null;res()};s.onended=go;setTimeout(go,buf.duration*1000+400);s.start()}).catch(online);
+  else online();
+})}
+// parts: chuỗi hoặc mảng các cụm; gap: nghỉ giữa các cụm (ms)
+function sayQueue(parts,done,gap=230){stopSpeech();const my=sayToken;parts=[].concat(parts).filter(Boolean);
+  (async()=>{for(let i=0;i<parts.length;i++){if(my!==sayToken)return;await playOne(parts[i],my);if(gap&&i<parts.length-1)await new Promise(r=>setTimeout(r,gap))}
+    if(my===sayToken&&done)done()})()}
+function say(x,done){sayQueue(x,done,40)}
 let unlocked=false;
-document.addEventListener('pointerdown',()=>{if(unlocked)return;unlocked=true;ac();if(hasTTS){const u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u)}},{capture:true});
+function unlockAudio(){if(unlocked)return;unlocked=true;ac();
+  try{onlineAudio.src='audio/silence.mp3';const p=onlineAudio.play();if(p&&p.catch)p.catch(()=>{})}catch(e){}
+  if(hasTTS){const u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u)}
+  // nạp sẵn các câu hay dùng
+  setTimeout(()=>{[...PRAISE,...Object.values(ONSET_SAY),...TONES.map(t=>TONE_NAME[t])].forEach(t=>{const f=AUDIO_IDX[nk(t)];if(f)loadBuf(f).catch(()=>{})})},800)}
+document.addEventListener('pointerdown',unlockAudio,{capture:true});
+// mọi nút bấm đều có tiếng "bóp"
+document.addEventListener('pointerdown',e=>{const b=e.target.closest('button');if(b&&!b.disabled&&!b.closest('#answers'))sfx.tap()},{capture:true});
 
 /* ================= PHÂN TÍCH TIẾNG VIỆT ================= */
 const TONE_MARKS={'\u0301':'sac','\u0300':'huyen','\u0309':'hoi','\u0303':'nga','\u0323':'nang'};
@@ -380,12 +442,18 @@ function tokScore(e,tok){
   if(tok===e.t)return 1;
   const a=stripAll(tok),b=stripAll(e.t);
   if(e.k==='onset'){const o=stripAll(e.o);if(a===b||a===o||(a.startsWith(o)&&a.length<=o.length+1&&/[oe]$/.test(a)))return .9;return 0}
-  if(e.k==='tone')return a===b?.9:0;
+  if(e.k==='tone')return a===b||(TONE_ALIAS[e.t]||[]).includes(tok)?.9:0;
   if(stripTone(tok)===stripTone(e.t))return e.k==='word'?.5:.8;
   if(a===b)return e.k==='word'?.3:.6;
   return 0}
+// máy nghe hay viết nhầm tên dấu thành từ gần âm
+const TONE_ALIAS={'sắc':['sắt','sát','sắp','xắc','sạc','sách','sác'],'huyền':['huyện','uyền','huyên','quyền','huyển'],'hỏi':['hội','hơi','hói','hổi','hởi'],'ngã':['ngả','ngà','nga','ngạ'],'nặng':['nắng','nạn','nặn','năng','nặn']};
+// Đổi chữ máy nghe được thành các tiếng: "a3" → "a ba", "10" → "mười"
+function speechTokens(text){
+  return String(text).toLowerCase().normalize('NFC').replace(/(\d+)/g,' $1 ').split(/[^\p{L}\d]+/u).filter(Boolean)
+    .flatMap(t=>/^\d+$/.test(t)?(+t<=99?numVi(+t).split(' '):t.split('').map(d=>DIG[+d])):[t])}
 function scoreSpell(y,text){
-  const toks=String(text).toLowerCase().normalize('NFC').split(/[^\p{L}]+/u).filter(Boolean);
+  const toks=speechTokens(text);
   const exp=expectedParts(y);let i=0,sum=0,word=0,tone=y.tone==='ngang'?1:0;const hit=[];
   for(const e of exp){let best=0,bj=-1;for(let j=i;j<Math.min(toks.length,i+4);j++){const s=tokScore(e,toks[j]);if(s>best){best=s;bj=j}if(s===1)break}
     if(bj>=0){i=bj+1;sum+=best}hit.push(best);if(e.k==='word')word=best;if(e.k==='tone')tone=best}
@@ -433,7 +501,8 @@ const EMOJI={'bố':'👨','mẹ':'👩','bà':'👵','ông':'👴','em':'🧒',
 /* ================= TOÁN ================= */
 const DIG=['không','một','hai','ba','bốn','năm','sáu','bảy','tám','chín','mười'];
 function numVi(n){n=+n;if(n<=10)return DIG[n];if(n<20)return'mười '+(n===15?'lăm':DIG[n-10]);const t=Math.floor(n/10),u=n%10;return DIG[t]+' mươi'+(u?' '+(u===1?'mốt':u===5?'lăm':u===4?'tư':DIG[u]):'')}
-function exprVi(s){return String(s).replace(/([+\-=?])/g,' $1 ').trim().split(/\s+/).map(t=>/^\d+$/.test(t)?numVi(t):t==='+'?'cộng':t==='-'?'trừ':t==='='?'bằng':t==='?'?'mấy':t).join(' ')}
+function exprParts(s){return String(s).replace(/([+\-=?])/g,' $1 ').trim().split(/\s+/).map(t=>/^\d+$/.test(t)?numVi(t):t==='+'?'cộng':t==='-'?'trừ':t==='='?'bằng':t==='?'?'mấy':t)}
+function exprVi(s){return exprParts(s).join(' ')}
 const SIGN_VI={'<':'bé hơn','>':'lớn hơn','=':'bằng'};
 const cmpSign=(a,b)=>a>b?'>':a<b?'<':'=';
 function numQ(a,op,b){return{kind:'math',type:'num',text:`${a} ${op} ${b}`,answer:op==='+'?a+b:a-b,a,b,op}}
@@ -472,24 +541,46 @@ function parseMath(raw){
 function parseMathText(text){const ok=[],bad=[];for(const line of String(text).split(/[\n;,]+/)){const t=line.trim();if(!t)continue;if(parseMath(t))ok.push(t);else bad.push(t)}return{ok,bad}}
 
 /* ================= ĐIỀU HƯỚNG ================= */
+/* Câu nói cố định — file giọng đọc được tạo sẵn cho đúng các câu này (xem tools/make_audio.py) */
+const names=()=>S.settings.names||'Haha và Hihi';
+const P={
+  hello:()=>`Xin chào ${names()}! Hôm nay hai bé muốn làm gì?`,
+  home:'Hai bé muốn làm gì nữa nào?',
+  learn:()=>`Mời ${names()} học để lấy đạn nhé! Bé muốn làm toán, đánh vần, hay cả hai?`,
+  shoot:'Đi bắn chim thôi!',
+  spell:'Bé đánh vần nhé',
+  missNo:'Chưa đúng rồi, bé thử lại nhé!',
+  louder:'Bé nói to hơn một chút nhé!',
+  wholeWord:'Bé mới đọc cả chữ, bé đánh vần từng phần nhé!',
+  listen:'Bé nghe mẫu rồi đánh vần lại nhé!',
+  noAmmo:'Hết đạn rồi! Bé đi học để lấy thêm đạn nhé!',
+  hit:['Trúng rồi!','Giỏi quá!','Tuyệt vời!','Bắn giỏi quá!'],
+  gold:'Chim vàng! Giỏi quá!',
+  combo:'Liên tiếp! Siêu quá!',
+  ok0:'Đúng rồi! Lần sau bé cố lên nhé!'
+};
+let lastScreen='home';
 function show(id){
   $$('.screen').forEach(e=>e.classList.toggle('active',e.id===id));
   if(id!=='shoot')stopShoot();
   if(id!=='quiz')stopRec();
-  if(id==='home'){renderHome();startHomeAnim()}else stopHomeAnim();
-  if(id==='learnMenu')renderLearnMenu();
+  if(id==='home'){renderHome();startHomeAnim();if(lastScreen!=='home'&&lastScreen!=='parent')say(P.home)}else stopHomeAnim();
+  if(id==='learnMenu'){renderLearnMenu();say(P.learn())}
+  if(id==='parent'||id==='summary')stopSpeech();
+  lastScreen=id;
 }
-document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){sfx.tap();show(g.dataset.go)}
-  const l=e.target.closest('[data-learn]');if(l){sfx.tap();startRound(l.dataset.learn)}});
+$('#splashGo').onclick=()=>{unlockAudio();$('#splash').classList.add('hide');sfx.fanfare();setTimeout(()=>say(P.hello()),700)};
+document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){sfx.whoosh();show(g.dataset.go)}
+  const l=e.target.closest('[data-learn]');if(l){sfx.whoosh();startRound(l.dataset.learn)}});
 
 function renderHome(){
-  $('#homeAmmo').textContent=S.bullets;
+  $('#homeAmmo').textContent=S.bullets;$('#helloNames').textContent=names();
   const d=day();
   $('#homeStat').textContent=`Hôm nay: ${d.right} câu đúng · bắt được ${d.birds} chú chim · Tổng cộng ${S.birdsTotal} chú chim 🐦`;
 }
 function renderLearnMenu(){const n=getSpellPool().length,m=getMathCustom().length;
   $('#learnInfo').textContent=`Đánh vần: ${n} từ${m?` · Toán của bố mẹ: ${m} bài`:''} · Mỗi câu đúng được ${S.settings.perCorrect} viên đạn 🎯`}
-$('#btnShoot').onclick=()=>{sfx.tap();startShoot()};
+$('#btnShoot').onclick=()=>{sfx.whoosh();startShoot()};
 
 /* ================= LƯỢT HỌC ================= */
 let R=null;
@@ -516,7 +607,7 @@ function startRound(kind){
   R={kind,qs:kind==='mix'?shuffle(qs):qs,i:0,right:0,earned:0};
   show('quiz');renderQ();
 }
-$('#quizBack').onclick=()=>{sayToken++;if(hasTTS)speechSynthesis.cancel();show('home')};
+$('#quizBack').onclick=()=>{stopSpeech();show('home')};
 function updAmmo(){$('#quizAmmo').textContent='🎯 '+S.bullets}
 function fb(t,color){const f=$('#fb');f.textContent=t;f.style.color=color||'var(--ink)'}
 function renderQ(){
@@ -545,17 +636,17 @@ function renderMath(q){
     card.innerHTML=`<div class="prompt">${q.type==='num'?'Bé tính nhé!':'Số nào còn thiếu?'}</div><div class="expr">${expr.replace(/-/g,'−')}</div>${mathPics(q)}`;
     const max=Math.max(10,q.answer);ans.innerHTML='';
     for(let v=0;v<=max;v++){const b=document.createElement('button');b.className='abtn';b.textContent=v;b.dataset.v=v;b.onclick=()=>answerMath(q,v,b);ans.appendChild(b)}
-    say(q.type==='num'?exprVi(q.text)+' bằng mấy?':exprVi(q.text));
+    say(q.type==='num'?[...exprParts(q.text),'bằng mấy']:exprParts(q.text));
   }else{
     card.innerHTML=`<div class="prompt">So sánh: bé chọn dấu nào?</div><div class="expr">${esc(q.L.text).replace(/-/g,'−')} <span class="blank" id="blank">?</span> ${esc(q.R.text).replace(/-/g,'−')}</div>${mathPics(q)}`;
     ans.className='answers three';ans.innerHTML='';
     for(const v of['<','=','>']){const b=document.createElement('button');b.className='abtn cmpbtn';b.innerHTML=`${v}<small>${v==='<'?'bé hơn':v==='>'?'lớn hơn':'bằng'}</small>`;b.dataset.v=v;b.onclick=()=>answerMath(q,v,b);ans.appendChild(b)}
-    say('So sánh '+exprVi(q.L.text)+' và '+exprVi(q.R.text));
+    say(['so sánh',...exprParts(q.L.text),'và',...exprParts(q.R.text)]);
   }
 }
 function answerMath(q,v,btn){
   if(q.done)return;
-  if(String(v)===String(q.answer)){q.done=true;btn.classList.add('right');const bl=$('#blank');bl.textContent=v;bl.classList.add('ok');finishQ(q,q.type==='num'?exprVi(q.text)+' bằng '+numVi(v):q.type==='miss'?exprVi(q.text.replace('?',v)):exprVi(q.L.text)+' '+SIGN_VI[v]+' '+exprVi(q.R.text))}
+  if(String(v)===String(q.answer)){q.done=true;btn.classList.add('right');const bl=$('#blank');bl.textContent=v;bl.classList.add('ok');finishQ(q,q.type==='num'?[...exprParts(q.text),'bằng',numVi(v)]:q.type==='miss'?exprParts(q.text.replace('?',v)):[...exprParts(q.L.text),SIGN_VI[v],...exprParts(q.R.text)])}
   else{q.mistakes++;btn.classList.add('wrong');btn.disabled=true;sfx.no();fb('Chưa đúng, bé thử lại nhé! 💪','#c44');
     if(q.mistakes>=2){const c=[...$$('#answers .abtn')].find(b=>b.dataset.v===String(q.answer));if(c)c.classList.add('hint')}}
 }
@@ -616,20 +707,22 @@ function stopRec2(q){if(recStop){const f=recStop;f(false)}}
 function micUi(q,state){const b=$('#micBtn');if(!b)return;q.listening=state==='listen';b.classList.toggle('listening',q.listening);
   b.textContent=state==='listen'?'✋ Bé đọc xong':state==='wait'?'⏳ Đang chấm…':(q.mistakes||q.heardOnce?'🎤 Đánh vần lại':'🎤 Bé đánh vần');b.disabled=state==='wait'}
 function startListen(q){
-  if(q.done)return;sayToken++;if(hasTTS)speechSynthesis.cancel();
-  beep(1046,.18,'sine',.3);
+  if(q.done)return;stopSpeech();
+  sfx.tit();
   $('#micStatus').textContent='🎙️ Đang nghe bé đánh vần…';$('#heard').textContent='';micUi(q,'listen');
   setTimeout(()=>listen({
     onInterim:t=>{const h=$('#heard');if(h)h.textContent='“'+t+'”'},
     onDone:(text,alts)=>{if(q.done||!$('#micBtn'))return;micUi(q,'idle');q.heardOnce=true;
-      if(!text){$('#micStatus').textContent='Máy chưa nghe thấy gì 🙉';fb('Bé nói to hơn một chút nhé, rồi bấm 🎤','var(--orange)');return}
+      if(!text){$('#micStatus').textContent='Máy chưa nghe thấy gì 🙉';fb('Bé nói to hơn một chút nhé, rồi bấm 🎤','var(--orange)');say(P.louder);return}
       $('#heard').textContent='Máy nghe được: “'+text+'”';
       const r=passSpell(q.y,[text,...alts]);
       if(r.ok){q.done=true;$('#micStatus').textContent='🎉 Bé đánh vần đúng rồi!';$('#readHint').textContent=spellText(q.y);sfx.ok();finishQ(q,'')}
       else{q.mistakes++;sfx.no();$('#spk').style.display='';
-        $('#micStatus').textContent=r.best.word>=.5&&r.best.score<.45?'Bé mới đọc cả chữ, chưa đánh vần từng phần':'Chưa đúng rồi';
-        fb(q.mistakes>=2?'Bé bấm 🔊 nghe mẫu, rồi đánh vần lại nhé!':'Bé thử đánh vần lại nhé! 💪','#c44');
-        if(q.mistakes>=2){$('#readHint').textContent=spellText(q.y);sayQueue(spellParts(q.y))}}},
+        const whole=r.best.word>=.5&&r.best.score<.45;
+        $('#micStatus').textContent=whole?'Bé mới đọc cả chữ, chưa đánh vần từng phần':'Chưa đúng rồi';
+        fb(q.mistakes>=2?'Bé nghe mẫu rồi đánh vần lại nhé!':'Bé thử đánh vần lại nhé! 💪','#c44');
+        if(q.mistakes>=2){$('#readHint').textContent=spellText(q.y);sayQueue([P.listen,...spellParts(q.y)])}
+        else say(whole?P.wholeWord:P.missNo)}},
     onError:err=>{micUi(q,'idle');
       if(err==='not-allowed'||err==='service-not-allowed'){$('#micStatus').textContent='⚠️ Chưa cho phép dùng micro';fb('Bố mẹ cho phép Micro và Nhận dạng giọng nói, hoặc bấm “Bố mẹ chấm”','#c44')}
       else{$('#micStatus').textContent='Micro gặp lỗi ('+err+')';fb('Bé bấm 🎤 thử lại nhé','#c44')}}
@@ -659,7 +752,8 @@ function finishQ(q,speakText){
   S.bullets+=earn;d.bullets+=earn;R.earned+=earn;save();
   const p=pick(PRAISE);
   if(earn>0){fb(`${p} +${earn} 🎯`,'var(--green)');flyReward(earn)}else fb('Đúng rồi! Lần sau bé cố lên nhé 💪','var(--orange)');
-  if(q.kind==='math'){sfx.ok();say((speakText?speakText+'. ':'')+p)}else say(p);
+  const praise=earn>0?p:P.ok0;
+  if(q.kind==='math'){sfx.ok();say([...(speakText||[]),praise])}else say(praise);
   setTimeout(nextQ,q.kind==='math'?1700:1300);
 }
 function flyReward(n){
@@ -674,10 +768,10 @@ function showSummary(){
   $('#sumEmoji').textContent=r===n?'🏆':r>=n*.7?'🎉':r>=n*.4?'👍':'💪';
   $('#sumTitle').textContent=r===n?'Bé đúng hết! Siêu quá!':r>=n*.7?'Bé giỏi lắm!':'Bé cố gắng lắm!';
   $('#sumText').innerHTML=`Đúng ngay ${r}/${n} câu<br>Được thêm <b style="color:var(--orange)">${R.earned} viên đạn 🎯</b><br>Bé đang có ${S.bullets} viên`;
-  show('summary');say(`Bé được ${R.earned} viên đạn. Đi bắn chim thôi!`);
+  show('summary');sfx.fanfare();setTimeout(()=>sayQueue(['Bé được',numVi(R.earned),'viên đạn','Đi bắn chim thôi!'],null,120),900);
 }
-$('#sumShoot').onclick=()=>{sfx.tap();startShoot()};
-$('#sumMore').onclick=()=>{sfx.tap();startRound(R?R.kind:'mix')};
+$('#sumShoot').onclick=()=>{sfx.whoosh();startShoot()};
+$('#sumMore').onclick=()=>{sfx.whoosh();startRound(R?R.kind:'mix')};
 
 /* ================= VẼ CHIM ================= */
 const COLORS=[
@@ -750,15 +844,18 @@ function drawCloud(c){cx.fillStyle='rgba(255,255,255,.92)';ell(cx,c.x,c.y,38*c.s
 function slingPos(){return{x:W/2,y:H-Math.max(70,H*.1)}}
 function startShoot(){
   show('shoot');resize();
-  G={birds:[],shots:[],parts:[],texts:[],clouds:mkClouds(),t:0,spawn:.2,caught:0,sling:0,outShown:false};
+  G={birds:[],shots:[],parts:[],texts:[],bubbles:[],clouds:mkClouds(),t:0,spawn:.2,caught:0,sling:0,outShown:false,combo:0,chirpT:.6,shake:0};
   for(let i=0;i<2;i++){spawnBird();G.birds[i].x=W*(.25+i*.45)}
   updHud();$('#noAmmo').classList.remove('show');
   if(S.bullets<=0)setTimeout(checkAmmo,300);
   lastT=performance.now();cancelAnimationFrame(raf);raf=requestAnimationFrame(loop);
+  updMusicBtn();musicStart();if(S.bullets>0)say(P.shoot);
 }
-function stopShoot(){cancelAnimationFrame(raf);raf=0}
+function stopShoot(){cancelAnimationFrame(raf);raf=0;musicStop()}
+function updMusicBtn(){$('#musicBtn').textContent=MUSIC.on?'🎵':'🔇'}
+$('#musicBtn').onclick=()=>{MUSIC.on=!MUSIC.on;S.settings.music=MUSIC.on;save();updMusicBtn();MUSIC.on?musicStart():musicStop()};
 window.addEventListener('resize',()=>{if($('#shoot').classList.contains('active')){resize();G.clouds=mkClouds()}if($('#home').classList.contains('active'))startHomeAnim()});
-$('#shootBack').onclick=()=>{sfx.tap();show('home')};
+$('#shootBack').onclick=()=>{show('home')};
 function updHud(){$('#hudAmmo').textContent=S.bullets;$('#hudBirds').textContent=G?G.caught:0}
 function spawnBird(){
   const dir=Math.random()<.5?1:-1,gold=Math.random()<.08,s=rnd(34,46)*U,y=H*(.12+Math.random()*.48);
@@ -779,17 +876,30 @@ function update(dt){
   G.parts=G.parts.filter(p=>p.life>0);
   for(const t of G.texts){t.y-=50*U*dt;t.life-=dt}G.texts=G.texts.filter(t=>t.life>0);
   for(const c of G.clouds){c.x+=c.v*dt;if(c.x-80*c.s>W)c.x=-80*c.s}
-  G.sling=Math.max(0,G.sling-dt*5);
+  G.sling=Math.max(0,G.sling-dt*5);G.shake=Math.max(0,G.shake-dt);
+  // chim hót líu lo ngẫu nhiên
+  G.chirpT-=dt;if(G.chirpT<=0){const fl=G.birds.filter(b=>b.state==='fly'&&b.x>0&&b.x<W);if(fl.length){const b=pick(fl);chirp(.06);G.bubbles.push({b,life:1.1,txt:pick(['♪','♫','chíp chíp','líu lo','chíp!'])})}G.chirpT=.8+Math.random()*2}
+  for(const u of G.bubbles)u.life-=dt;G.bubbles=G.bubbles.filter(u=>u.life>0&&u.b.state==='fly');
   if(S.bullets<=0&&!G.shots.length&&!G.outShown)setTimeout(checkAmmo,700),G.outShown=true;
 }
 function hitBird(b){
   b.state='hit';b.vy=-260*U;const pts=b.gold?3:1;G.caught+=pts;S.birdsTotal+=pts;day().birds+=pts;save();updHud();
   for(let i=0;i<14;i++){const a=Math.random()*Math.PI*2,v=(80+Math.random()*180)*U;
     G.parts.push({x:b.x,y:b.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-60*U,g:220*U,life:.9+Math.random()*.5,max:1.4,r:Math.random()*6,vr:(Math.random()-.5)*10,kind:i<9?'f':'s',col:i%2?b.c.body:b.c.wing,size:(6+Math.random()*6)*U})}
-  G.texts.push({x:b.x,y:b.y-b.s,txt:b.gold?'+3 👑':'+1',life:1,col:b.gold?'#e09b00':'#ff5a5f'});
-  sfx.pop();if(b.gold)setTimeout(()=>say('Chim vàng! Giỏi quá!'),150);else if(G.caught%5===0)setTimeout(()=>say(pick(['Giỏi quá!','Trúng rồi!','Tuyệt vời!'])),150);
+  G.parts.push({x:b.x,y:b.y,vx:0,vy:0,g:0,life:.45,max:.45,r:0,vr:0,kind:'ring',col:b.gold?'#ffd000':'#fff',size:b.s});
+  G.combo++;G.shake=.22;
+  G.texts.push({x:b.x,y:b.y-b.s,txt:b.gold?'+3 👑':'+1',life:1,col:b.gold?'#e09b00':'#ff5a5f',sz:1});
+  G.texts=G.texts.filter(t=>!t.center);
+  G.texts.push({center:true,x:W/2,y:H*.3,txt:G.combo>=3?`Liên tiếp ×${G.combo}! 🔥`:pick(['Trúng rồi! 🎯','Bắn giỏi quá!','Hay quá! ⭐','Trúng! 💥']),life:1.1,col:G.combo>=3?'#ff5a5f':'#8a5cf6',sz:1.25});
+  sfx.hit();
+  if(b.gold){sfx.fanfare();setTimeout(()=>say(P.gold),250)}
+  else if(G.combo>=3&&G.combo%3===0)setTimeout(()=>say(P.combo),250);
+  else if(Math.random()<.4)setTimeout(()=>say(pick(P.hit)),250);
 }
-function missAt(x,y){for(let i=0;i<6;i++){const a=Math.random()*Math.PI*2;G.parts.push({x,y,vx:Math.cos(a)*60*U,vy:Math.sin(a)*60*U,g:0,life:.4,max:.4,r:0,vr:0,kind:'d',col:'rgba(255,255,255,.9)',size:7*U})}sfx.miss()}
+function missAt(x,y){for(let i=0;i<6;i++){const a=Math.random()*Math.PI*2;G.parts.push({x,y,vx:Math.cos(a)*60*U,vy:Math.sin(a)*60*U,g:0,life:.4,max:.4,r:0,vr:0,kind:'d',col:'rgba(255,255,255,.9)',size:7*U})}
+  G.combo=0;sfx.miss();G.texts.push({x,y:y-10*U,txt:'Hụt rồi!',life:.7,col:'#7a8ca0',sz:.7});
+  // chim gần đó "cười" chíp chíp trêu bé
+  setTimeout(()=>chirp(.05,0,5),200)}
 cv.addEventListener('pointerdown',e=>{
   if(!G)return;e.preventDefault();
   if(S.bullets<=0){checkAmmo();return}
@@ -799,12 +909,18 @@ cv.addEventListener('pointerdown',e=>{
   if(best)best.targeted=true;
   const sp=slingPos();G.shots.push({sx:sp.x,sy:sp.y-30*U,tx:x,ty:y,bird:best,t:0,dur:.2+Math.hypot(x-sp.x,y-sp.y)/(3000*U),x:sp.x,y:sp.y,trail:[]});
   G.sling=1;sfx.shoot();
+  for(let i=0;i<5;i++){const a=-Math.PI/2+(Math.random()-.5)*1.2;G.parts.push({x:sp.x,y:sp.y-30*U,vx:Math.cos(a)*120*U,vy:Math.sin(a)*120*U,g:200*U,life:.35,max:.35,r:0,vr:0,kind:'d',col:'#ffd166',size:4*U})}
 });
-function checkAmmo(){if(!$('#shoot').classList.contains('active'))return;if(S.bullets<=0&&!G.shots.length){$('#noAmmoBirds').textContent=G.caught;$('#noAmmo').classList.add('show');say('Hết đạn rồi! Bé đi học để lấy thêm đạn nhé!')}}
+function checkAmmo(){if(!$('#shoot').classList.contains('active'))return;if(S.bullets<=0&&!G.shots.length){$('#noAmmoBirds').textContent=G.caught;$('#noAmmo').classList.add('show');musicStop();sfx.no();setTimeout(()=>say(P.noAmmo),400)}}
 function draw(){
-  cx.drawImage(bgCanvas,0,0,W,H);
+  cx.save();if(G.shake>0)cx.translate((Math.random()-.5)*14*G.shake*U*4,(Math.random()-.5)*14*G.shake*U*4);
+  cx.drawImage(bgCanvas,-20,-20,W+40,H+40);
   for(const c of G.clouds)drawCloud(c);
   for(const b of G.birds)drawBird(cx,b,G.t);
+  // bong bóng "chíp chíp"
+  for(const u of G.bubbles){const b=u.b,x=b.x+b.dir*b.s*.6,y=b.y-b.s*1.25;cx.globalAlpha=Math.min(1,u.life*2);cx.font=`800 ${Math.round(16*U)}px ui-rounded,system-ui,sans-serif`;cx.textAlign='center';
+    const w=cx.measureText(u.txt).width+16*U;cx.fillStyle='#fff';cx.beginPath();cx.roundRect?cx.roundRect(x-w/2,y-14*U,w,24*U,12*U):cx.rect(x-w/2,y-14*U,w,24*U);cx.fill();cx.fillStyle='#e8590c';cx.fillText(u.txt,x,y+4*U)}
+  cx.globalAlpha=1;
   // ná
   const sp=slingPos(),k=G.sling;cx.lineCap='round';
   cx.strokeStyle='#8d5a3b';cx.lineWidth=14*U;cx.beginPath();cx.moveTo(sp.x,sp.y+60*U);cx.lineTo(sp.x,sp.y);cx.stroke();
@@ -817,10 +933,11 @@ function draw(){
   for(const p of G.parts){cx.globalAlpha=Math.max(0,Math.min(1,p.life/(p.max*.6)));
     if(p.kind==='f'){cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.fillStyle=p.col;ell(cx,0,0,p.size,p.size*.4);cx.restore()}
     else if(p.kind==='s'){cx.font=`${Math.round(p.size*2)}px sans-serif`;cx.textAlign='center';cx.fillText(Math.random()<.5?'✨':'💖',p.x,p.y)}
+    else if(p.kind==='ring'){const k=1-p.life/p.max;cx.strokeStyle=p.col;cx.lineWidth=6*U*(1-k);cx.beginPath();cx.arc(p.x,p.y,p.size*(.6+k*1.6),0,Math.PI*2);cx.stroke()}
     else{cx.fillStyle=p.col;ell(cx,p.x,p.y,p.size,p.size)}}
   cx.globalAlpha=1;
-  for(const t of G.texts){cx.globalAlpha=Math.min(1,t.life*1.5);cx.font=`900 ${Math.round(34*U)}px ui-rounded,system-ui,sans-serif`;cx.textAlign='center';cx.lineWidth=6;cx.strokeStyle='#fff';cx.strokeText(t.txt,t.x,t.y);cx.fillStyle=t.col;cx.fillText(t.txt,t.x,t.y)}
-  cx.globalAlpha=1;
+  for(const t of G.texts){cx.globalAlpha=Math.min(1,t.life*1.5);cx.font=`900 ${Math.round(34*U*(t.sz||1))}px ui-rounded,system-ui,sans-serif`;cx.textAlign='center';cx.lineWidth=7;cx.strokeStyle='#fff';cx.strokeText(t.txt,t.x,t.y);cx.fillStyle=t.col;cx.fillText(t.txt,t.x,t.y)}
+  cx.globalAlpha=1;cx.restore();
 }
 
 /* ================= GÓC BỐ MẸ ================= */
@@ -837,7 +954,7 @@ function renderParent(){
   const st=S.settings;
   $('#setPer').value=st.perCorrect;$('#setLen').value=st.roundLen;$('#setMax').value=st.maxNum;
   $('#mAdd').checked=st.math.add;$('#mSub').checked=st.math.sub;$('#mCmp').checked=st.math.cmp;$('#mCmp2').checked=st.math.cmp2;$('#mMiss').checked=st.math.miss;
-  $('#setPics').checked=st.showPics;$('#setSpell').value=st.spellMode;$('#setStrict').value=st.strict||'vua';$('#setShowWord').checked=st.showWord;$('#setRate').value=st.rate;
+  $('#setPics').checked=st.showPics;$('#setNames').value=names();$('#setSpell').value=st.spellMode;$('#setStrict').value=st.strict||'vua';$('#setShowWord').checked=st.showWord;$('#setRate').value=st.rate;
   pickVoice();
   $('#voiceInfo').innerHTML=!hasTTS?'<span class="bad">Máy này không hỗ trợ đọc giọng nói.</span>':viVoice?`Đang dùng giọng: <b>${esc(viVoice.name)}</b>`:
     '<span class="bad">Chưa thấy giọng tiếng Việt nên game đang im lặng (không đọc bằng giọng Anh nữa).</span> Trên iPad/iPhone: Cài đặt → Trợ năng → Nội dung được đọc → Giọng nói → Tiếng Việt → tải giọng "Linh".';
@@ -847,10 +964,11 @@ function bindSet(id,fn){$(id).addEventListener('change',()=>{fn($(id));save()})}
 bindSet('#setPer',e=>S.settings.perCorrect=+e.value);bindSet('#setLen',e=>S.settings.roundLen=+e.value);bindSet('#setMax',e=>S.settings.maxNum=+e.value);
 bindSet('#mAdd',e=>S.settings.math.add=e.checked);bindSet('#mSub',e=>S.settings.math.sub=e.checked);bindSet('#mCmp',e=>S.settings.math.cmp=e.checked);
 bindSet('#mCmp2',e=>S.settings.math.cmp2=e.checked);bindSet('#mMiss',e=>S.settings.math.miss=e.checked);bindSet('#setPics',e=>S.settings.showPics=e.checked);
+bindSet('#setNames',e=>{S.settings.names=e.value.trim()||'Haha và Hihi'});
 bindSet('#setSpell',e=>S.settings.spellMode=e.value);bindSet('#setStrict',e=>S.settings.strict=e.value);
 $('#testMic').onclick=()=>{const info=$('#micInfo');
   if(!micReady()){info.innerHTML=`<span class="bad">${!SR?'Trình duyệt này chưa hỗ trợ nghe giọng nói. Trên iPad/iPhone hãy dùng Safari.':'Phải mở game bằng địa chỉ https:// mới dùng được micro.'}</span>`;return}
-  const y=parseSyl('bà');info.textContent='🎙️ Đang nghe… anh nói đi';beep(1046,.18,'sine',.3);
+  const y=parseSyl('bà');info.textContent='🎙️ Đang nghe… anh nói đi';sfx.tit();
   setTimeout(()=>listen({onInterim:t=>info.textContent='🎙️ “'+t+'”',
     onDone:(t,alts)=>{if(!t){info.textContent='Không nghe thấy gì.';return}const r=passSpell(y,[t,...alts]);info.innerHTML=`Máy nghe được: <b>“${esc(t)}”</b> → ${r.ok?'✅ chấm ĐÚNG':'❌ chấm SAI'} (điểm ${Math.round(r.best.score*100)}%)`},
     onError:e=>info.innerHTML=`<span class="bad">Lỗi micro: ${esc(e)}. Kiểm tra Cài đặt → Safari → Micro, và Cài đặt → Siri → bật Đọc chính tả (Dictation).</span>`}),280)};bindSet('#setShowWord',e=>S.settings.showWord=e.checked);bindSet('#setRate',e=>S.settings.rate=+e.value);
