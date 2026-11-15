@@ -77,6 +77,7 @@ h2{margin:8px 0 14px;font-size:clamp(24px,5vw,36px);text-align:center}
 .cmpvis{display:flex;justify-content:space-around;font-size:clamp(16px,3vw,22px);color:var(--blue);letter-spacing:2px}
 .answers{width:min(96vw,760px);margin-top:14px;display:grid;gap:12px;grid-template-columns:repeat(6,1fr)}
 .answers.three{grid-template-columns:repeat(3,1fr)}
+.answers.seven{grid-template-columns:repeat(7,1fr)}
 .answers.four{grid-template-columns:repeat(4,1fr)}
 .answers.two{grid-template-columns:repeat(2,1fr)}
 .abtn{border:none;border-radius:22px;background:#fff;font-size:clamp(28px,6vw,44px);font-weight:900;min-height:clamp(62px,11vw,86px);box-shadow:0 6px 0 rgba(0,0,0,.12);padding:4px}
@@ -296,6 +297,8 @@ td,th{padding:6px;border-bottom:1px solid #eee;text-align:center}
     <label class="chk"><input type="checkbox" id="mCmp"> So sánh số (3 ? 5)</label>
     <label class="chk"><input type="checkbox" id="mCmp2"> So sánh 2 phép tính (2 + 3 ? 1 + 4)</label>
     <label class="chk"><input type="checkbox" id="mMiss"> Điền số còn thiếu (3 + ? = 5)</label>
+    <label class="chk"><input type="checkbox" id="mThree"> Phép tính 3 số (5 + 3 − 2)</label>
+    <div class="hint">Bài toán chụp/gõ của bố mẹ: game hỏi lại bài gốc và <b>tự ra thêm nhiều bài cùng dạng</b> (cùng số lượng số, cùng dấu + −, đổi số khác trong phạm vi trên).</div>
     <label class="chk"><input type="checkbox" id="setPics"> Hiện quả táo để bé đếm</label>
     <label class="row">Cách đánh vần
       <select id="setSpell">
@@ -387,6 +390,7 @@ const DEFAULT={
 function merge(a,b){for(const k in b){const v=b[k];if(v&&typeof v==='object'&&!Array.isArray(v)&&a[k]&&typeof a[k]==='object'&&!Array.isArray(a[k]))merge(a[k],v);else a[k]=v}return a}
 function load(){let s=clone(DEFAULT);try{const raw=localStorage.getItem(KEY);if(raw)s=merge(s,JSON.parse(raw))}catch(e){}
   if(!s.v||s.v<2){s.settings.spellMode='noi';s.v=2}// bản 2: mặc định bé nói, máy chấm
+  if(s.v<3){s.settings.maxNum=20;s.settings.math.three=true;s.v=3}// bản 3: phạm vi 20, có phép tính 3 số
   if(!Array.isArray(s.kids)||!s.kids.length){const ns=String(s.settings.names||'Haha và Hihi').split(/\s*,\s*|\s+và\s+|\s*&\s*/).filter(Boolean).slice(0,4);
     s.kids=(ns.length?ns:['Bé']).map((n,i)=>({id:'k'+i+'_'+Date.now(),name:n,face:null,shirt:['#ff6b6b','#4dabf7','#69db7c','#b197fc'][i%4],acc:i%2?'mu':'no'}))}
   return s}
@@ -625,8 +629,30 @@ const cmpSign=(a,b)=>a>b?'>':a<b?'<':'=';
 function numQ(a,op,b){return{kind:'math',type:'num',text:`${a} ${op} ${b}`,answer:op==='+'?a+b:a-b,a,b,op}}
 function randExpr(max){if(Math.random()<.5){const a=rnd(0,max),b=rnd(0,max-a);return{text:`${a} + ${b}`,val:a+b}}const a=rnd(1,max),b=rnd(0,a);return{text:`${a} - ${b}`,val:a-b}}
 function exprWithVal(v,max){if(Math.random()<.5||v===max){const a=rnd(0,v);return{text:`${a} + ${v-a}`,val:v}}const b=rnd(1,max-v);return{text:`${v+b} - ${b}`,val:v}}
+// Biểu thức n số, mọi bước tính đều nằm trong 0..max (không ra số âm). ops: dãy dấu cố định hoặc bỏ trống = ngẫu nhiên
+function genExpr(n,max,ops){
+  for(let k=0;k<300;k++){let v=rnd(1,max);const parts=[v];let ok=true;
+    for(let i=1;i<n;i++){const op=ops?ops[i-1]:(Math.random()<.5?'+':'-');let b;
+      if(op==='+'){if(v>=max){ok=false;break}b=rnd(1,max-v);v+=b}else{if(v<=0){ok=false;break}b=rnd(1,v);v-=b}
+      parts.push(op,b)}
+    if(ok)return{text:parts.join(' '),val:v,terms:parts.map(String)}}
+  return{text:'2 + 1',val:3,terms:['2','+','1']}}
+function cmpOf(L,R){return{kind:'math',type:/[+-]/.test(L.text+R.text)?'cmp2':'cmp',L,R,answer:cmpSign(L.val,R.val)}}
+// Ra bài cùng dạng với 1 bài của bố mẹ: cùng số lượng số, cùng dấu, đổi số khác
+function similarMath(src){const q=parseMath(src);if(!q)return genMath();
+  const nums=(String(src).match(/\d+/g)||[]).map(Number),max=Math.max(+S.settings.maxNum,...nums)>10?20:10;
+  const opsOf=t=>String(t).split(/\s+/).filter(x=>x==='+'||x==='-');
+  if(q.type==='num'){const ops=opsOf(q.text);return mkNum(parseExpr(genExpr(ops.length+1,max,ops).text))}
+  if(q.type==='cmp'||q.type==='cmp2'){const side=e=>{const ops=opsOf(e.text);if(!ops.length){const n=rnd(0,max);return{text:''+n,val:n}}return genExpr(ops.length+1,max,ops)};
+    const L=side(q.L);let R=side(q.R);if(Math.random()<.3)for(let k=0;k<40&&R.val!==L.val;k++)R=side(q.R);return cmpOf(L,R)}
+  // điền số thiếu: giữ vị trí dấu ?
+  const[l,r]=q.text.split('=').map(x=>x.trim().split(/\s+/));
+  if(r.length===1&&r[0]!=='?'){const pos=l.indexOf('?'),ops=l.filter(x=>x==='+'||x==='-');const e=genExpr(ops.length+1,max,ops);const t=e.text.split(' ');const ans=+t[pos];t[pos]='?';
+    return{kind:'math',type:'miss',text:t.join(' ')+' = '+e.val,answer:ans}}
+  return genMath()}
 function genMath(){
   const m=S.settings.math,max=+S.settings.maxNum;const types=Object.keys(m).filter(k=>m[k]);const t=types.length?pick(types):'add';
+  if(t==='three'){const e=genExpr(3,max);return mkNum(parseExpr(e.text))}
   if(t==='add'){let a=rnd(0,max),b=rnd(0,max-a);if(a+b===0)b=1;return numQ(a,'+',b)}
   if(t==='sub'){const a=rnd(1,max),b=rnd(0,a);return numQ(a,'-',b)}
   if(t==='cmp'){const a=rnd(0,max),b=Math.random()<.2?a:rnd(0,max);return{kind:'math',type:'cmp',L:{text:''+a,val:a},R:{text:''+b,val:b},answer:cmpSign(a,b)}}
@@ -720,15 +746,20 @@ function startRound(kind,only){
   const n=+S.settings.roundLen;
   if(only){const m=S.settings.spellMode,qs=[];
     for(const y of[...new Set(only.spell||[])].map(parseSyl).filter(Boolean))qs.push({kind:'spell',mode:['noi','doc','ghep'].includes(m)?m:'noi',y});
-    for(const t of only.math||[]){const q=parseMath(t);if(q)qs.push(q)}
-    if(!qs.length)return;R={kind:'mix',only,qs:shuffle(qs).slice(0,Math.max(n,10)),i:0,right:0,earned:0};show('quiz');renderQ();return}const pool=getSpellPool();const custom=getMathCustom();
+    const src=(only.math||[]).filter(t=>parseMath(t));let sp=shuffle(qs);if(src.length)sp=sp.slice(0,Math.ceil(n/2));
+    const mq=[],nm=src.length?Math.max(n-sp.length,Math.min(src.length,n)):0,orig=shuffle(src);
+    for(let i=0;i<nm;i++)mq.push(i<Math.ceil(nm*.4)&&orig[i]?parseMath(orig[i]):similarMath(pick(src)));
+    const all=[...sp,...mq];if(!all.length)return;R={kind:'mix',only,qs:shuffle(all),i:0,right:0,earned:0};show('quiz');renderQ();return}const pool=getSpellPool();const custom=getMathCustom();
   if(kind==='spell'&&!pool.length){alert('Chưa có bài đánh vần nào được bật. Bố mẹ vào ⚙️ để thêm bài nhé.');return}
   const nSpell=kind==='spell'?n:kind==='mix'?(pool.length?Math.ceil(n/2):0):0;
   const words=spellBag(pool,nSpell);const qs=[];
   for(const y of words){const m=S.settings.spellMode;qs.push({kind:'spell',mode:['noi','doc','ghep'].includes(m)?m:'noi',y})}
   const customBag=shuffle(custom);
   for(let i=qs.length;i<n;i++){
-    if(customBag.length&&Math.random()<.6)qs.push(parseMath(customBag.pop()));else qs.push(genMath());
+    const r=Math.random();
+    if(customBag.length&&r<.35)qs.push(parseMath(customBag.pop()));        // bài gốc của bố mẹ
+    else if(custom.length&&r<.8)qs.push(similarMath(pick(custom)));      // bài cùng dạng, đổi số
+    else qs.push(genMath());
   }
   R={kind,qs:kind==='mix'?shuffle(qs):qs,i:0,right:0,earned:0};
   show('quiz');renderQ();
@@ -760,7 +791,7 @@ function renderMath(q){
   if(q.type==='num'||q.type==='miss'){
     const expr=q.type==='num'?`${esc(q.text)} = <span class="blank" id="blank">?</span>`:esc(q.text).replace('?','<span class="blank" id="blank">?</span>');
     card.innerHTML=`<div class="prompt">${q.type==='num'?'Bé tính nhé!':'Số nào còn thiếu?'}</div><div class="expr">${expr.replace(/-/g,'−')}</div>${mathPics(q)}`;
-    const max=Math.max(10,q.answer);ans.innerHTML='';
+    const max=q.answer>10||+S.settings.maxNum>10?20:10;if(max>10)ans.className='answers seven';ans.innerHTML='';
     for(let v=0;v<=max;v++){const b=document.createElement('button');b.className='abtn';b.textContent=v;b.dataset.v=v;b.onclick=()=>answerMath(q,v,b);ans.appendChild(b)}
     say(q.type==='num'?[...exprParts(q.text),'bằng mấy']:exprParts(q.text));
   }else{
@@ -1419,7 +1450,7 @@ const PH={spell:'Gõ hoặc dán các tiếng/từ trong bài, cách nhau bằng
 function renderParent(){
   const st=S.settings;
   $('#setPer').value=st.perCorrect;$('#setLen').value=st.roundLen;$('#setMax').value=st.maxNum;
-  $('#mAdd').checked=st.math.add;$('#mSub').checked=st.math.sub;$('#mCmp').checked=st.math.cmp;$('#mCmp2').checked=st.math.cmp2;$('#mMiss').checked=st.math.miss;
+  $('#mAdd').checked=st.math.add;$('#mSub').checked=st.math.sub;$('#mCmp').checked=st.math.cmp;$('#mCmp2').checked=st.math.cmp2;$('#mMiss').checked=st.math.miss;$('#mThree').checked=!!st.math.three;
   $('#setPics').checked=st.showPics;$('#setKey').value=st.apiKey||'';$('#setSpell').value=st.spellMode;$('#setStrict').value=st.strict||'vua';$('#setShowWord').checked=st.showWord;$('#setRate').value=st.rate;
   pickVoice();
   $('#voiceInfo').innerHTML=!hasTTS?'<span class="bad">Máy này không hỗ trợ đọc giọng nói.</span>':viVoice?`Đang dùng giọng: <b>${esc(viVoice.name)}</b>`:
@@ -1429,7 +1460,7 @@ function renderParent(){
 function bindSet(id,fn){$(id).addEventListener('change',()=>{fn($(id));save()})}
 bindSet('#setPer',e=>S.settings.perCorrect=+e.value);bindSet('#setLen',e=>S.settings.roundLen=+e.value);bindSet('#setMax',e=>S.settings.maxNum=+e.value);
 bindSet('#mAdd',e=>S.settings.math.add=e.checked);bindSet('#mSub',e=>S.settings.math.sub=e.checked);bindSet('#mCmp',e=>S.settings.math.cmp=e.checked);
-bindSet('#mCmp2',e=>S.settings.math.cmp2=e.checked);bindSet('#mMiss',e=>S.settings.math.miss=e.checked);bindSet('#setPics',e=>S.settings.showPics=e.checked);
+bindSet('#mCmp2',e=>S.settings.math.cmp2=e.checked);bindSet('#mMiss',e=>S.settings.math.miss=e.checked);bindSet('#mThree',e=>S.settings.math.three=e.checked);bindSet('#setPics',e=>S.settings.showPics=e.checked);
 bindSet('#setKey',e=>{S.settings.apiKey=e.value.trim()});
 bindSet('#setSpell',e=>S.settings.spellMode=e.value);bindSet('#setStrict',e=>S.settings.strict=e.value);
 $('#testMic').onclick=()=>{const info=$('#micInfo');
