@@ -245,13 +245,23 @@ td,th{padding:6px;border-bottom:1px solid #eee;text-align:center}
   </div>
 
   <div class="panel">
-    <h3>📚 Bài học</h3>
-    <h4 style="margin-top:4px">📷 Chụp bài tập → game tự soạn bài</h4>
-    <div class="hint">Chụp trang sách hoặc phiếu bài tập của bé. Game đọc ảnh, tìm phép toán và các tiếng để đánh vần; bố mẹ xem lại rồi lưu. Ở màn hình chính cũng có nút 📷.</div>
-    <button class="pbtn" data-snap="cam">📷 Chụp ảnh</button><button class="pbtn gray" data-snap="lib">🖼 Chọn ảnh có sẵn</button>
-    <div class="hint">Tick bài nào thì bài đó được đưa vào lượt học. Bài toán của anh sẽ được trộn với toán máy tự ra.</div>
-    <div id="lessonList"></div>
+    <h3>🔢 Bài tập Toán</h3>
+    <div class="hint">Chụp trang sách / phiếu bài tập <b>toán</b> của bé → game tự tìm các phép tính. Bài toán của bố mẹ được trộn với toán máy tự ra.</div>
+    <button class="pbtn" data-snap="cam" data-stype="math">📷 Chụp bài toán</button><button class="pbtn gray" data-snap="lib" data-stype="math">🖼 Chọn ảnh có sẵn</button><button class="pbtn gray" data-type-new="math">⌨️ Gõ bài toán</button>
+    <div class="hint" style="margin-top:10px">Tick bài nào thì bài đó được đưa vào lượt học:</div>
+    <div id="lessonListMath"></div>
+  </div>
 
+  <div class="panel">
+    <h3>🔤 Bài tập Tiếng Việt (đánh vần)</h3>
+    <div class="hint">Chụp trang sách / phiếu bài tập <b>tiếng Việt</b> của bé → game tự tìm các tiếng để bé đánh vần.</div>
+    <button class="pbtn" data-snap="cam" data-stype="spell">📷 Chụp bài tiếng Việt</button><button class="pbtn gray" data-snap="lib" data-stype="spell">🖼 Chọn ảnh có sẵn</button><button class="pbtn gray" data-type-new="spell">⌨️ Gõ bài tiếng Việt</button>
+    <div class="hint" style="margin-top:10px">Tick bài nào thì bài đó được đưa vào lượt học:</div>
+    <div id="lessonListSpell"></div>
+  </div>
+
+  <div class="panel">
+    <h3>⌨️ Gõ bài bằng tay</h3>
     <h4 id="formTitle">➕ Thêm bài mới</h4>
     <div class="row"><input type="text" id="newName" placeholder="Tên bài (VD: Bài 12 – âm b)"></div>
     <div class="row">Loại bài
@@ -327,15 +337,18 @@ td,th{padding:6px;border-bottom:1px solid #eee;text-align:center}
 <input type="file" id="snapCam" accept="image/*" capture="environment" hidden>
 <input type="file" id="snapLib" accept="image/*" hidden>
 <div class="modal" id="snapModal"><div class="ov-card snapcard">
-  <h3 style="margin:0 0 8px">📷 Soạn bài từ ảnh</h3>
+  <h3 style="margin:0 0 8px" id="snapTitle">📷 Soạn bài từ ảnh</h3>
+  <div id="snapPick" style="display:none"><p>Bố mẹ chụp bài gì?</p>
+    <button class="big-btn green" data-snap="cam" data-stype="math" style="width:100%">🔢 Chụp bài Toán</button>
+    <button class="big-btn blue" data-snap="cam" data-stype="spell" style="width:100%">🔤 Chụp bài Tiếng Việt</button></div>
   <img id="snapImg" alt="" style="max-width:100%;max-height:170px;border-radius:12px">
   <div id="snapStatus" class="hint" style="font-size:17px"></div>
   <div id="snapRes" style="display:none;text-align:left">
     <input type="text" id="snapName" placeholder="Tên bài">
-    <h4>🔢 Toán <small style="color:var(--muted)">(mỗi dòng một bài: 3 + 4 · 4 ? 7 · 2 + 3 ? 1 + 4 · 3 + ? = 5)</small></h4>
-    <textarea id="snapMath" rows="4"></textarea><div class="hint" id="snapMathPv"></div>
-    <h4>🔤 Đánh vần <small style="color:var(--muted)">(các tiếng, cách nhau dấu phẩy)</small></h4>
-    <textarea id="snapSpell" rows="3"></textarea><div class="hint" id="snapSpellPv"></div>
+    <div id="snapMathBox"><h4>🔢 Toán <small style="color:var(--muted)">(mỗi dòng một bài: 3 + 4 · 4 ? 7 · 2 + 3 ? 1 + 4 · 3 + ? = 5)</small></h4>
+    <textarea id="snapMath" rows="4"></textarea><div class="hint" id="snapMathPv"></div></div>
+    <div id="snapSpellBox"><h4>🔤 Đánh vần <small style="color:var(--muted)">(các tiếng, cách nhau dấu phẩy)</small></h4>
+    <textarea id="snapSpell" rows="3"></textarea><div class="hint" id="snapSpellPv"></div></div>
   </div>
   <div><button class="pbtn" id="snapPlay" style="display:none;background:var(--green)">▶️ Lưu &amp; cho bé học ngay</button><button class="pbtn" id="snapSave" style="display:none">💾 Chỉ lưu</button><button class="pbtn gray" id="snapRetry" style="display:none">📷 Chụp lại</button><button class="pbtn gray" id="snapClose">Đóng</button></div>
 </div></div>
@@ -1053,7 +1066,12 @@ $('#faceSave').onclick=()=>{const N=220,c=document.createElement('canvas');c.wid
   FE.kid.face=c.toDataURL('image/jpeg',.85);delete faceImg[FE.kid.id];save();$('#faceModal').classList.remove('show');renderKids();setTimeout(drawKidPreviews,200)};
 
 /* ================= CHỤP BÀI TẬP → BÀI HỌC ================= */
-$$('[data-snap]').forEach(b=>b.onclick=()=>{const i=b.dataset.snap==='cam'?$('#snapCam'):$('#snapLib');i.value='';i.click()});
+let snapType='both';
+$$('[data-snap]').forEach(b=>b.onclick=()=>{snapType=b.dataset.stype||'both';const i=b.dataset.snap==='cam'?$('#snapCam'):$('#snapLib');i.value='';i.click()});
+const SNAP_TITLE={math:'🔢 Soạn bài Toán từ ảnh',spell:'🔤 Soạn bài Tiếng Việt từ ảnh',both:'📷 Soạn bài từ ảnh'};
+function snapBoxes(){$('#snapTitle').textContent=SNAP_TITLE[snapType];$('#snapMathBox').style.display=snapType==='spell'?'none':'';$('#snapSpellBox').style.display=snapType==='math'?'none':''}
+function openSnapPick(){snapType='both';$('#snapTitle').textContent='📷 Chụp bài tập';$('#snapPick').style.display='';$('#snapRes').style.display='none';$('#snapImg').removeAttribute('src');snapStatus('');
+  ['#snapPlay','#snapSave','#snapRetry'].forEach(i=>$(i).style.display='none');$('#snapModal').classList.add('show')}
 ['#snapCam','#snapLib'].forEach(id=>$(id).addEventListener('change',e=>{const f=e.target.files[0];if(f)snapFile(f)}));
 const snapStatus=(t,bad)=>{const el=$('#snapStatus');el.innerHTML=t;el.style.color=bad?'var(--red)':''};
 async function fileToCanvas(file,max){const url=URL.createObjectURL(file);
@@ -1062,7 +1080,7 @@ async function fileToCanvas(file,max){const url=URL.createObjectURL(file);
     c.getContext('2d').drawImage(im,0,0,c.width,c.height);return c}finally{setTimeout(()=>URL.revokeObjectURL(url),2000)}}
 let snapBusy=false;
 async function snapFile(file){if(snapBusy)return;snapBusy=true;stopSpeech();
-  $('#snapModal').classList.add('show');$('#snapRes').style.display='none';['#snapPlay','#snapSave','#snapRetry'].forEach(i=>$(i).style.display='none');
+  $('#snapModal').classList.add('show');$('#snapPick').style.display='none';snapBoxes();$('#snapRes').style.display='none';['#snapPlay','#snapSave','#snapRetry'].forEach(i=>$(i).style.display='none');
   snapStatus('⏳ Đang mở ảnh…');$('#snapImg').removeAttribute('src');
   try{const c=await fileToCanvas(file,1600);$('#snapImg').src=c.toDataURL('image/jpeg',.6);let res=null,note='';
     if(S.settings.apiKey){try{snapStatus('🤖 Claude đang đọc bài tập… (khoảng 10–30 giây)');res=await readWithClaude(c)}catch(e){note=`⚠️ ${esc(e.message)} — chuyển sang tự đọc chữ.<br>`}}
@@ -1076,9 +1094,10 @@ function showSnapResult(r,note){
   $('#snapName').value=r.name||('Bài chụp '+new Date().toLocaleDateString('vi-VN'));
   $('#snapMath').value=math.join('\n');$('#snapSpell').value=spell.join(', ');
   $('#snapRes').style.display='';updSnapPv();['#snapPlay','#snapSave','#snapRetry'].forEach(i=>$(i).style.display='');
-  snapStatus(note+(math.length||spell.length?`✅ Tìm được ${math.length} bài toán, ${spell.length} tiếng để đánh vần. Bố mẹ xem lại, sửa hoặc xoá chỗ chưa đúng rồi bấm lưu.`:'😕 Chưa tìm được bài nào. Anh thử chụp gần hơn, đủ sáng, giữ máy thẳng — hoặc gõ tay vào 2 ô dưới.'),!math.length&&!spell.length);
+  const nm=snapType==='spell'?0:math.length,ns=snapType==='math'?0:spell.length,found=[nm?`${nm} bài toán`:'',ns?`${ns} tiếng để đánh vần`:''].filter(Boolean).join(', ');
+  snapStatus(note+(found?`✅ Tìm được ${found}. Bố mẹ xem lại, sửa hoặc xoá chỗ chưa đúng rồi bấm lưu.`:'😕 Chưa tìm được bài nào. Anh thử chụp gần hơn, đủ sáng, giữ máy thẳng — hoặc gõ tay vào ô dưới.'),!found);
   if(!math.length&&!spell.length)$('#snapRes').style.display=''}
-function snapItems(){return{math:parseMathText($('#snapMath').value).ok,spell:parseSpellText($('#snapSpell').value).ok}}
+function snapItems(){return{math:snapType==='spell'?[]:parseMathText($('#snapMath').value).ok,spell:snapType==='math'?[]:parseSpellText($('#snapSpell').value).ok}}
 function updSnapPv(){const m=parseMathText($('#snapMath').value),sp=parseSpellText($('#snapSpell').value);
   $('#snapMathPv').innerHTML=`✅ ${m.ok.length} bài`+(m.bad.length?` · <span class="bad">không hiểu: ${esc(m.bad.join(' | '))}</span>`:'');
   $('#snapSpellPv').innerHTML=`✅ ${sp.ok.length} tiếng`+(sp.bad.length?` · <span class="bad">bỏ: ${esc(sp.bad.join(', '))}</span>`:'')}
@@ -1389,7 +1408,7 @@ let gateAns=0;
 let gateCb=null;
 function openGate(cb){const a=rnd(6,9),b=rnd(3,9);gateAns=a*b;gateCb=cb;$('#gateQ').textContent=`${a} × ${b} = ?`;$('#gateA').value='';$('#gateA').style.borderColor='';$('#gate').classList.add('show');setTimeout(()=>$('#gateA').focus(),100)}
 $('#btnParent').onclick=()=>openGate(()=>{show('parent');renderParent()});
-$('#btnSnap').onclick=()=>openGate(()=>$('#snapCam').click());
+$('#btnSnap').onclick=()=>openGate(openSnapPick);
 $('#gateCancel').onclick=()=>$('#gate').classList.remove('show');
 const gateTry=()=>{if(+$('#gateA').value===gateAns){$('#gate').classList.remove('show');const f=gateCb;gateCb=null;f&&f()}else{$('#gateA').value='';$('#gateA').style.borderColor='var(--red)'}};
 $('#gateOk').onclick=gateTry;$('#gateA').addEventListener('keydown',e=>{if(e.key==='Enter')gateTry()});
@@ -1422,12 +1441,14 @@ $('#testMic').onclick=()=>{const info=$('#micInfo');
 $('#testVoice').onclick=()=>sayQueue(['bờ','a','ba','huyền','bà']);
 
 function renderLessons(){
-  $('#lessonList').innerHTML=S.lessons.map(l=>{const n=l.items.length;
+  for(const type of['math','spell']){const box=$(type==='math'?'#lessonListMath':'#lessonListSpell');
+  box.innerHTML=S.lessons.filter(l=>l.type===type).map(l=>{const n=l.items.length;
     return`<div class="lesson ${l.active?'':'off'}"><label class="chk"><input type="checkbox" data-act="${l.id}" ${l.active?'checked':''}> <b>${esc(l.name)}</b>&nbsp;<small>(${l.type==='spell'?'Đánh vần':'Toán'} · ${n} ${l.type==='spell'?'từ':'bài'})</small></label>
     <div class="items">${esc(l.items.slice(0,40).join(', '))}${n>40?' …':''}</div>
-    <button class="pbtn gray" data-edit="${l.id}">✏️ Sửa</button><button class="pbtn gray" data-del="${l.id}">🗑 Xoá</button></div>`}).join('')||'<div class="hint">Chưa có bài nào.</div>';
+    <button class="pbtn gray" data-edit="${l.id}">✏️ Sửa</button><button class="pbtn gray" data-del="${l.id}">🗑 Xoá</button></div>`}).join('')||'<div class="hint">Chưa có bài nào — bấm 📷 để chụp bài.</div>'}
 }
-$('#lessonList').addEventListener('click',e=>{
+$('#parent').addEventListener('click',e=>{
+  const tn=e.target.closest('[data-type-new]');if(tn){resetForm();$('#newType').value=tn.dataset.typeNew;updPreview();$('#formTitle').textContent=tn.dataset.typeNew==='math'?'➕ Gõ bài toán mới':'➕ Gõ bài tiếng Việt mới';$('#formTitle').scrollIntoView({behavior:'smooth'});setTimeout(()=>$('#newName').focus(),400);return}
   const a=e.target.closest('[data-act]'),ed=e.target.closest('[data-edit]'),del=e.target.closest('[data-del]');
   if(a){const l=S.lessons.find(x=>x.id===a.dataset.act);l.active=a.checked;save();renderLessons()}
   if(ed){const l=S.lessons.find(x=>x.id===ed.dataset.edit);editingId=l.id;$('#newName').value=l.name;$('#newType').value=l.type;$('#newItems').value=l.type==='spell'?l.items.join(', '):l.items.join('\n');
