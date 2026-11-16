@@ -144,9 +144,57 @@ td,th{padding:6px;border-bottom:1px solid #eee;text-align:center}
 #gate input{font-size:28px;width:140px;text-align:center;padding:8px;border-radius:14px;border:3px solid #ddd;margin:8px}
 @media (max-height:700px){#quizKids{display:none}}
 @media (max-height:560px){.qcard{padding:8px 12px}.expr{font-size:44px}.word{font-size:52px}.pic{font-size:48px}.answers{margin-top:8px;gap:8px}.abtn{min-height:52px;font-size:28px}}
+
+/* ===== GIAO DIỆN ĐỘI CẢNH SÁT CÚN (nhân vật tự vẽ riêng cho game) ===== */
+.cop{display:none}
+body.police .cop{display:block}
+body.police{--bg:#eaf3ff;--green:#1f6fe0;--orange:#ffbf1f;--blue:#1f6fe0}
+body.police .big-btn{border:4px solid #ffd84a}
+body.police .big-btn.orange{color:#12306b;text-shadow:0 1px 0 rgba(255,255,255,.5)}
+body.police #home{background:linear-gradient(#1d3f8f,#3d7be0 38%,#bfe0ff 70%,#eaf3ff)}
+body.police #home::after{content:"";position:absolute;left:0;right:0;bottom:0;height:22px;background:repeating-linear-gradient(-45deg,#ffd200 0 26px,#1b1b1b 26px 52px);opacity:.9}
+body.police .title{font-size:clamp(36px,8vw,64px);color:#ffd84a;text-shadow:0 4px 0 #12306b,0 8px 16px rgba(0,0,0,.3)}
+body.police .hello{color:#fff;text-shadow:0 2px 0 #12306b}
+body.police .hello b{color:#ffd84a}
+body.police .ask{color:#12306b}
+body.police .ammo-big{border:3px solid #1f6fe0}
+body.police .card-btn{border-top:10px solid #1f6fe0;position:relative}
+body.police .card-btn::after{content:"★";position:absolute;top:6px;right:12px;color:#ffbf1f;font-size:26px}
+body.police #learnMenu,body.police #shootMenu,body.police #summary,body.police #quiz{background:linear-gradient(#dcebff,#f4f9ff 55%,#eaf3ff)}
+body.police .qcard{border:5px solid #1f6fe0;padding-top:24px;overflow:hidden}
+body.police .qcard::before{content:"";position:absolute;left:0;right:0;top:0;height:12px;background:repeating-linear-gradient(90deg,#1f6fe0 0 18px,#fff 18px 36px)}
+body.police .progress i.done{background:#ffbf1f}
+body.police .abtn{border:3px solid #cfe0ff}
+body.police .abtn.right{background:#2fb36b;border-color:#2fb36b}
+.badge-sub{display:none;margin:-2px auto 4px;background:#ffd84a;color:#12306b;font-weight:900;border-radius:999px;padding:6px 18px;font-size:clamp(17px,3.8vw,22px);box-shadow:0 4px 0 #12306b}
+body.police .badge-sub{display:inline-block}
+body.police .splash-bird{display:none}
+body.police .splash{background:linear-gradient(#1d3f8f,#3d7be0 50%,#bfe0ff)}
+.cop-wrap{position:relative;display:flex;align-items:flex-end;justify-content:center;gap:6px}
+.cop svg{width:100%;height:100%;overflow:visible}
+#copHome{width:120px;height:120px;flex:none;animation:copBob 2.2s ease-in-out infinite}
+#copQuiz{position:fixed;left:calc(env(safe-area-inset-left) + 6px);bottom:calc(env(safe-area-inset-bottom) + 4px);width:clamp(96px,17vw,150px);height:clamp(96px,17vw,150px);z-index:30;pointer-events:none;transform-origin:50% 100%}
+#copSum{width:170px;height:170px;margin:0 auto}
+.cop-bubble{position:fixed;left:calc(env(safe-area-inset-left) + clamp(100px,17vw,152px));bottom:calc(env(safe-area-inset-bottom) + clamp(70px,12vw,110px));background:#fff;border:4px solid #1f6fe0;border-radius:22px;padding:8px 16px;font-weight:900;font-size:clamp(18px,3.6vw,26px);color:#12306b;z-index:31;opacity:0;transform:scale(.4);transform-origin:0 100%;transition:all .25s cubic-bezier(.3,1.6,.6,1);pointer-events:none;white-space:nowrap}
+.cop-bubble.show{opacity:1;transform:scale(1)}
+body:not(.police) .cop-bubble{display:none}
+.cop.jump{animation:copJump .7s ease}
+.cop.oops{animation:copTilt .6s ease}
+@keyframes copBob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-10px) rotate(2deg)}}
+@keyframes copJump{0%{transform:translateY(0) scale(1)}30%{transform:translateY(-40px) scale(1.08,.95)}55%{transform:translateY(0) scale(1.1,.9)}75%{transform:translateY(-12px)}100%{transform:translateY(0)}}
+@keyframes copTilt{0%,100%{transform:rotate(0)}30%{transform:rotate(-12deg)}65%{transform:rotate(8deg)}}
+.siren{position:fixed;inset:0;pointer-events:none;z-index:25;opacity:0}
+.siren.on{animation:siren .9s steps(1) 2}
+@keyframes siren{0%{opacity:1;background:radial-gradient(circle at 0 0,rgba(255,40,60,.45),transparent 45%)}25%{opacity:1;background:radial-gradient(circle at 100% 0,rgba(40,110,255,.5),transparent 45%)}50%{opacity:1;background:radial-gradient(circle at 0 0,rgba(255,40,60,.45),transparent 45%)}75%{opacity:1;background:radial-gradient(circle at 100% 0,rgba(40,110,255,.5),transparent 45%)}100%{opacity:0}}
+.lightbar{display:none;gap:8px;margin-bottom:4px}
+body.police .lightbar{display:flex}
+.lightbar i{width:38px;height:16px;border-radius:10px 10px 4px 4px;background:#ff3b4e;box-shadow:0 0 14px #ff3b4e;animation:blinkR 1s steps(1) infinite}
+.lightbar i+i{background:#2f7bff;box-shadow:0 0 14px #2f7bff;animation-name:blinkB}
+@keyframes blinkR{50%{opacity:.25}}@keyframes blinkB{0%{opacity:.25}50%{opacity:1}}
 </style>
 </head>
 <body>
+<div class="siren" id="siren"></div>
 
 <!-- HOME -->
 <section id="home" class="screen active">
@@ -154,14 +202,15 @@ td,th{padding:6px;border-bottom:1px solid #eee;text-align:center}
   <button class="snap" id="btnSnap" aria-label="Chụp bài tập">📷</button>
   <div class="hello">Xin chào <b id="helloNames">Haha và Hihi</b> 👋</div>
   <div class="title">Bé Học<br>Bắn Chim</div>
-  <canvas id="homeCv"></canvas>
+  <div class="badge-sub">🚓 Đội Cảnh Sát Nhí</div>
+  <div class="cop-wrap"><div class="cop" id="copHome"></div><canvas id="homeCv"></canvas></div>
   <div class="ask" id="homeAsk">Hôm nay hai bé muốn làm gì?</div>
   <div class="ammo-big">🎯 <b id="homeAmmo">0</b> viên đạn</div>
   <button class="big-btn green" data-go="learnMenu">📚 Học lấy đạn</button>
   <button class="big-btn orange" id="btnShoot">🎯 Đi bắn chim, gà, vịt</button>
   <div class="small" id="homeStat"></div>
   <div class="splash" id="splash"><div class="splash-in">
-    <div style="font-size:90px;animation:bounce 1.2s infinite">🐦</div>
+    <div class="splash-bird" style="font-size:90px;animation:bounce 1.2s infinite">🐦</div><div class="cop" id="copSplash" style="width:150px;height:150px;margin:0 auto;animation:bounce 1.2s infinite"></div>
     <div class="title" style="font-size:clamp(34px,9vw,60px)">Bé Học Bắn Chim</div>
     <button class="big-btn orange" id="splashGo">👆 Chạm để bắt đầu</button>
   </div></div>
@@ -190,10 +239,13 @@ td,th{padding:6px;border-bottom:1px solid #eee;text-align:center}
   <div class="answers" id="answers"></div>
   <div class="feedback" id="fb"></div>
   <canvas id="quizKids"></canvas>
+  <div class="cop" id="copQuiz"></div>
+  <div class="cop-bubble" id="copBubble"></div>
 </section>
 
 <!-- SUMMARY -->
 <section id="summary" class="screen">
+  <div class="cop" id="copSum"></div>
   <div class="sum-emoji" id="sumEmoji">🎉</div>
   <h2 id="sumTitle"></h2>
   <div id="sumText"></div>
@@ -310,6 +362,7 @@ td,th{padding:6px;border-bottom:1px solid #eee;text-align:center}
       <select id="setStrict"><option value="de">Dễ (bé mới tập)</option><option value="vua">Vừa</option><option value="kho">Khó (phải đủ và đúng dấu)</option></select></label>
     <div class="row"><button class="pbtn" id="testMic">🎤 Thử micro: nói “bờ – a – ba – huyền – bà”</button></div>
     <div class="hint" id="micInfo"></div>
+    <label class="row">Giao diện <select id="setTheme"><option value="police">🚓 Đội cảnh sát Cún</option><option value="plain">🐦 Bé học bắn chim (cũ)</option></select></label>
     <label class="chk"><input type="checkbox" id="setShowWord"> Hiện chữ khi đánh vần (tắt = bé chỉ nghe và nhìn hình, khó hơn)</label>
     <label class="row">Tốc độ đọc <input type="range" min="0.5" max="1.2" step="0.05" id="setRate"></label>
     <div class="row"><button class="pbtn" id="testVoice">🔊 Thử giọng: "bờ – a – ba – huyền – bà"</button></div>
@@ -390,7 +443,8 @@ const DEFAULT={
 function merge(a,b){for(const k in b){const v=b[k];if(v&&typeof v==='object'&&!Array.isArray(v)&&a[k]&&typeof a[k]==='object'&&!Array.isArray(a[k]))merge(a[k],v);else a[k]=v}return a}
 function load(){let s=clone(DEFAULT);try{const raw=localStorage.getItem(KEY);if(raw)s=merge(s,JSON.parse(raw))}catch(e){}
   if(!s.v||s.v<2){s.settings.spellMode='noi';s.v=2}// bản 2: mặc định bé nói, máy chấm
-  if(s.v<3){s.settings.maxNum=20;s.settings.math.three=true;s.v=3}// bản 3: phạm vi 20, có phép tính 3 số
+  if(s.v<3){s.settings.maxNum=20;s.settings.math.three=true;s.v=3}
+  if(s.v<4){s.settings.theme='police';s.v=4}// bản 4: giao diện đội cảnh sát Cún// bản 3: phạm vi 20, có phép tính 3 số
   if(!Array.isArray(s.kids)||!s.kids.length){const ns=String(s.settings.names||'Haha và Hihi').split(/\s*,\s*|\s+và\s+|\s*&\s*/).filter(Boolean).slice(0,4);
     s.kids=(ns.length?ns:['Bé']).map((n,i)=>({id:'k'+i+'_'+Date.now(),name:n,face:null,shirt:['#ff6b6b','#4dabf7','#69db7c','#b197fc'][i%4],acc:i%2?'mu':'no'}))}
   return s}
@@ -804,7 +858,7 @@ function renderMath(q){
 function answerMath(q,v,btn){
   if(q.done)return;
   if(String(v)===String(q.answer)){q.done=true;btn.classList.add('right');const bl=$('#blank');bl.textContent=v;bl.classList.add('ok');finishQ(q,q.type==='num'?[...exprParts(q.text),'bằng',numVi(v)]:q.type==='miss'?exprParts(q.text.replace('?',v)):[...exprParts(q.L.text),SIGN_VI[v],...exprParts(q.R.text)])}
-  else{q.mistakes++;btn.classList.add('wrong');btn.disabled=true;sfx.no();fb('Chưa đúng, bé thử lại nhé! 💪','#c44');
+  else{q.mistakes++;btn.classList.add('wrong');btn.disabled=true;sfx.no();copOops();fb('Chưa đúng, bé thử lại nhé! 💪','#c44');
     if(q.mistakes>=2){const c=[...$$('#answers .abtn')].find(b=>b.dataset.v===String(q.answer));if(c)c.classList.add('hint')}}
 }
 
@@ -842,7 +896,7 @@ function pickSpell(q,o,btn){
       if(q.step>=q.steps.length){q.done=true;drawSpell(q);fb(spellText(q.y),'var(--blue)');sfx.ok();
         sayQueue(spellParts(q.y),()=>finishQ(q,''))}
       else drawSpell(q)},650);
-  }else{q.mistakes++;q.stepMiss++;btn.classList.add('wrong');btn.disabled=true;sfx.no();fb('Chưa đúng, bé nghe lại nhé! 👂','#c44');say(q.y.word);
+  }else{q.mistakes++;q.stepMiss++;btn.classList.add('wrong');btn.disabled=true;sfx.no();copOops();fb('Chưa đúng, bé nghe lại nhé! 👂','#c44');say(q.y.word);
     if(q.stepMiss>=2){const c=[...$$('#answers .abtn')].find(b=>b.dataset.v===st.answer);if(c)c.classList.add('hint')}}
 }
 
@@ -911,7 +965,7 @@ function finishQ(q,speakText){
   if(q.kind==='spell'){const w=q.y.word;if(q.mistakes>0)S.stats.miss[w]=(S.stats.miss[w]||0)+1;else if(S.stats.miss[w]){S.stats.miss[w]--;if(!S.stats.miss[w])delete S.stats.miss[w]}}
   S.bullets+=earn;d.bullets+=earn;R.earned+=earn;save();
   const p=pick(PRAISE);
-  kidsHappy();
+  kidsHappy();copCheer(earn>0?p:'Cố lên nhé!');
   if(earn>0){fb(`${p} +${earn} 🎯`,'var(--green)');flyReward(earn)}else fb('Đúng rồi! Lần sau bé cố lên nhé 💪','var(--orange)');
   const praise=earn>0?p:P.ok0;
   if(q.kind==='math'){sfx.ok();say([...(speakText||[]),praise])}else say(praise);
@@ -929,7 +983,7 @@ function showSummary(){
   $('#sumEmoji').textContent=r===n?'🏆':r>=n*.7?'🎉':r>=n*.4?'👍':'💪';
   $('#sumTitle').textContent=r===n?'Bé đúng hết! Siêu quá!':r>=n*.7?'Bé giỏi lắm!':'Bé cố gắng lắm!';
   $('#sumText').innerHTML=`Đúng ngay ${r}/${n} câu<br>Được thêm <b style="color:var(--orange)">${R.earned} viên đạn 🎯</b><br>Bé đang có ${S.bullets} viên`;
-  show('summary');sfx.fanfare();setTimeout(()=>sayQueue(['Bé được',numVi(R.earned),'viên đạn','Đi bắn chim thôi!'],null,120),900);
+  show('summary');sfx.fanfare();if(isPolice()){const c=$('#copSum');c.classList.remove('jump');void c.offsetWidth;c.classList.add('jump');sirenFlash()}setTimeout(()=>sayQueue(['Bé được',numVi(R.earned),'viên đạn','Đi bắn chim thôi!'],null,120),900);
 }
 $('#sumShoot').onclick=()=>{sfx.whoosh();show('shootMenu')};
 $('#sumMore').onclick=()=>{sfx.whoosh();startRound(R?R.kind:'mix',R&&R.only)};
@@ -1451,7 +1505,7 @@ function renderParent(){
   const st=S.settings;
   $('#setPer').value=st.perCorrect;$('#setLen').value=st.roundLen;$('#setMax').value=st.maxNum;
   $('#mAdd').checked=st.math.add;$('#mSub').checked=st.math.sub;$('#mCmp').checked=st.math.cmp;$('#mCmp2').checked=st.math.cmp2;$('#mMiss').checked=st.math.miss;$('#mThree').checked=!!st.math.three;
-  $('#setPics').checked=st.showPics;$('#setKey').value=st.apiKey||'';$('#setSpell').value=st.spellMode;$('#setStrict').value=st.strict||'vua';$('#setShowWord').checked=st.showWord;$('#setRate').value=st.rate;
+  $('#setPics').checked=st.showPics;$('#setKey').value=st.apiKey||'';$('#setSpell').value=st.spellMode;$('#setStrict').value=st.strict||'vua';$('#setShowWord').checked=st.showWord;$('#setTheme').value=st.theme||'police';$('#setRate').value=st.rate;
   pickVoice();
   $('#voiceInfo').innerHTML=!hasTTS?'<span class="bad">Máy này không hỗ trợ đọc giọng nói.</span>':viVoice?`Đang dùng giọng: <b>${esc(viVoice.name)}</b>`:
     '<span class="bad">Chưa thấy giọng tiếng Việt nên game đang im lặng (không đọc bằng giọng Anh nữa).</span> Trên iPad/iPhone: Cài đặt → Trợ năng → Nội dung được đọc → Giọng nói → Tiếng Việt → tải giọng "Linh".';
@@ -1468,7 +1522,7 @@ $('#testMic').onclick=()=>{const info=$('#micInfo');
   const y=parseSyl('bà');info.textContent='🎙️ Đang nghe… anh nói đi';sfx.tit();
   setTimeout(()=>listen({onInterim:t=>info.textContent='🎙️ “'+t+'”',
     onDone:(t,alts)=>{if(!t){info.textContent='Không nghe thấy gì.';return}const r=passSpell(y,[t,...alts]);info.innerHTML=`Máy nghe được: <b>“${esc(t)}”</b> → ${r.ok?'✅ chấm ĐÚNG':'❌ chấm SAI'} (điểm ${Math.round(r.best.score*100)}%)`},
-    onError:e=>info.innerHTML=`<span class="bad">Lỗi micro: ${esc(e)}. Kiểm tra Cài đặt → Safari → Micro, và Cài đặt → Siri → bật Đọc chính tả (Dictation).</span>`}),280)};bindSet('#setShowWord',e=>S.settings.showWord=e.checked);bindSet('#setRate',e=>S.settings.rate=+e.value);
+    onError:e=>info.innerHTML=`<span class="bad">Lỗi micro: ${esc(e)}. Kiểm tra Cài đặt → Safari → Micro, và Cài đặt → Siri → bật Đọc chính tả (Dictation).</span>`}),280)};bindSet('#setShowWord',e=>S.settings.showWord=e.checked);bindSet('#setTheme',e=>{S.settings.theme=e.value;applyTheme()});bindSet('#setRate',e=>S.settings.rate=+e.value);
 $('#testVoice').onclick=()=>sayQueue(['bờ','a','ba','huyền','bà']);
 
 function renderLessons(){
@@ -1527,6 +1581,39 @@ $('#resetAll').onclick=()=>{if(confirm('Xoá HẾT bài học, điểm và cài 
 /* ================= KHỞI ĐỘNG ================= */
 show('home');
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
+
+/* ===== ĐỘI CẢNH SÁT CÚN: chó Labrador vàng đội mũ cảnh sát (nhân vật vẽ riêng cho game) ===== */
+function copSVG(){return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+<ellipse cx="100" cy="194" rx="58" ry="6" fill="rgba(0,0,0,.15)"/>
+<path d="M58 192 Q56 140 100 136 Q144 140 142 192Z" fill="#1f5fd6"/>
+<path d="M88 138 L100 160 L112 138Z" fill="#fff"/><path d="M96 146 L100 176 L104 146Z" fill="#12306b"/>
+<path d="M128 154 l5 10 11 1 -8 7 3 11 -11 -6 -11 6 3 -11 -8 -7 11 -1Z" fill="#ffc21a" stroke="#c98a00" stroke-width="2"/>
+<ellipse cx="62" cy="178" rx="13" ry="15" fill="#f0bf63"/><ellipse cx="138" cy="178" rx="13" ry="15" fill="#f0bf63"/>
+<path d="M46 84 Q22 92 30 134 Q38 150 54 136 Q62 110 62 92Z" fill="#d9963a"/>
+<path d="M154 84 Q178 92 170 134 Q162 150 146 136 Q138 110 138 92Z" fill="#d9963a"/>
+<ellipse cx="100" cy="100" rx="56" ry="50" fill="#f3c66d"/>
+<ellipse cx="100" cy="122" rx="32" ry="24" fill="#fff0d2"/>
+<ellipse cx="80" cy="96" rx="8" ry="10" fill="#2b1d14"/><ellipse cx="120" cy="96" rx="8" ry="10" fill="#2b1d14"/>
+<circle cx="83" cy="92" r="3" fill="#fff"/><circle cx="123" cy="92" r="3" fill="#fff"/>
+<ellipse cx="68" cy="112" rx="8" ry="5" fill="#ff9d9d" opacity=".55"/><ellipse cx="132" cy="112" rx="8" ry="5" fill="#ff9d9d" opacity=".55"/>
+<path d="M90 110 Q100 104 110 110 Q106 120 100 120 Q94 120 90 110Z" fill="#2b1d14"/>
+<path d="M88 126 Q100 136 112 126" stroke="#2b1d14" stroke-width="4" fill="none" stroke-linecap="round"/>
+<path d="M95 130 Q100 146 105 130Z" fill="#ff6f86"/>
+<path d="M40 62 Q100 22 160 62 L156 70 Q100 52 44 70Z" fill="#12306b"/>
+<path d="M50 62 Q52 30 100 26 Q148 30 150 62 Q100 46 50 62Z" fill="#1f5fd6"/>
+<rect x="44" y="60" width="112" height="9" rx="4" fill="#ffc21a"/>
+<path d="M100 34 l5 9 10 1 -7 7 2 10 -10 -5 -10 5 2 -10 -7 -7 10 -1Z" fill="#ffd84a" stroke="#c98a00" stroke-width="2"/>
+</svg>`}
+function isPolice(){return (S.settings.theme||'police')==='police'}
+function applyTheme(){document.body.classList.toggle('police',isPolice())}
+['copHome','copQuiz','copSum','copSplash'].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML=copSVG()});
+applyTheme();
+let copT=0;
+function copBubble(t){const b=$('#copBubble');if(!b)return;b.textContent=t;b.classList.add('show');clearTimeout(copT);copT=setTimeout(()=>b.classList.remove('show'),1500)}
+function sirenFlash(){const s=$('#siren');s.classList.remove('on');void s.offsetWidth;s.classList.add('on');
+  if(ac()){beep(880,.22,'triangle',.07,-220,0);beep(660,.22,'triangle',.07,220,.24)}}
+function copCheer(text){if(!isPolice())return;const c=$('#copQuiz');c.classList.remove('jump','oops');void c.offsetWidth;c.classList.add('jump');copBubble(text);sirenFlash()}
+function copOops(){if(!isPolice())return;const c=$('#copQuiz');c.classList.remove('jump','oops');void c.offsetWidth;c.classList.add('oops');copBubble('Thử lại nào! 🐾')}
 </script>
 </body>
 </html>
