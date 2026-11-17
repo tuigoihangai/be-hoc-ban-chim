@@ -446,7 +446,8 @@ function load(){let s=clone(DEFAULT);try{const raw=localStorage.getItem(KEY);if(
   if(s.v<3){s.settings.maxNum=20;s.settings.math.three=true;s.v=3}
   if(s.v<4){s.settings.theme='police';s.v=4}// bản 4: giao diện đội cảnh sát Cún// bản 3: phạm vi 20, có phép tính 3 số
   if(!Array.isArray(s.kids)||!s.kids.length){const ns=String(s.settings.names||'Haha và Hihi').split(/\s*,\s*|\s+và\s+|\s*&\s*/).filter(Boolean).slice(0,4);
-    s.kids=(ns.length?ns:['Bé']).map((n,i)=>({id:'k'+i+'_'+Date.now(),name:n,face:null,shirt:['#ff6b6b','#4dabf7','#69db7c','#b197fc'][i%4],acc:i%2?'mu':'no'}))}
+    s.kids=(ns.length?ns:['Bé']).map((n,i)=>({id:'k'+i+'_'+Date.now(),name:n,face:null,shirt:['#4dabf7','#f783ac','#69db7c','#b197fc'][i%4],acc:i%2?'no':'mu',gender:i%2?'gai':'trai'}))}
+  if(s.v<5){s.kids.forEach(k=>{const n=String(k.name||'').trim().toLowerCase();if(n==='haha'){k.gender='trai';k.acc='mu';k.shirt='#4dabf7'}else if(n==='hihi'){k.gender='gai';k.acc='no';k.shirt='#f783ac'}});s.v=5}// bản 5: Haha bé trai, Hihi bé gái
   return s}
 let S=load();
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
@@ -1052,6 +1053,7 @@ function drawKid(ctx,k,x,y,s,t,o={}){
   if(o.name!==false&&k.name){ctx.fillStyle='#fff';ctx.font=`900 ${Math.round(s*.34)}px ui-rounded,system-ui,sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(k.name.slice(0,8),0,s*.12,s*1.3);ctx.textBaseline='alphabetic'}
   // đầu
   const hy=-s*1.25+bob,R=s*.95,im=kidFace(k);
+  if(k.gender==='gai'){ctx.fillStyle='#3b2a20';ell(ctx,-R*.98,hy+R*.2,R*.3,R*.52,.35);ell(ctx,R*.98,hy+R*.2,R*.3,R*.52,-.35);ctx.fillStyle='#ff4d8d';ell(ctx,-R*.86,hy-R*.22,R*.13,R*.13);ell(ctx,R*.86,hy-R*.22,R*.13,R*.13)}
   ctx.save();ctx.beginPath();ctx.arc(0,hy,R,0,Math.PI*2);
   if(im){ctx.save();ctx.clip();ctx.drawImage(im,-R,hy-R,R*2,R*2);ctx.restore()}
   else{ctx.fillStyle='#ffd8b5';ctx.fill();
@@ -1105,20 +1107,20 @@ function syncNames(){S.settings.names=joinNames(S.kids.map(k=>k.name.trim()));sa
 function renderKids(){
   $('#kidList').innerHTML=S.kids.map(k=>`<div class="kid"><canvas data-kcv="${k.id}"></canvas><div class="kf">
     <input type="text" data-kname="${k.id}" value="${esc(k.name)}" placeholder="Tên bé" maxlength="14">
-    <div><select data-kshirt="${k.id}">${SHIRTS.map(([c,n])=>`<option value="${c}" ${k.shirt===c?'selected':''}>Áo ${n}</option>`).join('')}</select><select data-kacc="${k.id}">${ACCS.map(([v,n])=>`<option value="${v}" ${(k.acc||'no')===v?'selected':''}>${n}</option>`).join('')}</select></div>
+    <div><select data-kgender="${k.id}"><option value="trai" ${k.gender!=='gai'?'selected':''}>👦 Bé trai</option><option value="gai" ${k.gender==='gai'?'selected':''}>👧 Bé gái</option></select><select data-kshirt="${k.id}">${SHIRTS.map(([c,n])=>`<option value="${c}" ${k.shirt===c?'selected':''}>Áo ${n}</option>`).join('')}</select><select data-kacc="${k.id}">${ACCS.map(([v,n])=>`<option value="${v}" ${(k.acc||'no')===v?'selected':''}>${n}</option>`).join('')}</select></div>
     <button class="pbtn" data-kphoto="${k.id}">📷 ${k.face?'Đổi ảnh':'Thêm ảnh bé'}</button>${k.face?`<button class="pbtn gray" data-knoface="${k.id}">Bỏ ảnh</button>`:''}${S.kids.length>1?`<button class="pbtn gray" data-kdel="${k.id}">🗑</button>`:''}
   </div></div>`).join('');
   $('#kidAdd').style.display=S.kids.length>=4?'none':'';drawKidPreviews();setTimeout(drawKidPreviews,300)}
 function drawKidPreviews(){$$('[data-kcv]').forEach(c=>{const k=S.kids.find(x=>x.id===c.dataset.kcv);if(!k)return;const{x,w,h}=fitCv(c);x.clearRect(0,0,w,h);drawKid(x,k,w/2,h*.74,h/3.9,1,{desk:true})})}
 const kidOf=id=>S.kids.find(k=>k.id===id);
 $('#kidList').addEventListener('input',e=>{const n=e.target.dataset.kname;if(n){kidOf(n).name=e.target.value.trim()||'Bé';syncNames();drawKidPreviews()}});
-$('#kidList').addEventListener('change',e=>{const d=e.target.dataset;if(d.kshirt){kidOf(d.kshirt).shirt=e.target.value}if(d.kacc){kidOf(d.kacc).acc=e.target.value}save();drawKidPreviews()});
+$('#kidList').addEventListener('change',e=>{const d=e.target.dataset;if(d.kshirt){kidOf(d.kshirt).shirt=e.target.value}if(d.kacc){kidOf(d.kacc).acc=e.target.value}if(d.kgender){kidOf(d.kgender).gender=e.target.value}save();drawKidPreviews()});
 let photoKid=null;
 $('#kidList').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const d=b.dataset;
   if(d.kphoto){photoKid=kidOf(d.kphoto);$('#kidFile').value='';$('#kidFile').click()}
   if(d.knoface){kidOf(d.knoface).face=null;save();renderKids()}
   if(d.kdel){const k=kidOf(d.kdel);if(confirm(`Xoá bé "${k.name}"?`)){S.kids=S.kids.filter(x=>x!==k);syncNames();renderKids()}}});
-$('#kidAdd').onclick=()=>{if(S.kids.length>=4)return;const i=S.kids.length;S.kids.push({id:'k'+Date.now(),name:'Bé '+(i+1),face:null,shirt:SHIRTS[i%SHIRTS.length][0],acc:ACCS[i%4][0]});syncNames();renderKids()};
+$('#kidAdd').onclick=()=>{if(S.kids.length>=4)return;const i=S.kids.length;S.kids.push({id:'k'+Date.now(),name:'Bé '+(i+1),face:null,shirt:SHIRTS[i%SHIRTS.length][0],acc:ACCS[i%4][0],gender:i%2?'gai':'trai'});syncNames();renderKids()};
 $('#kidFile').addEventListener('change',e=>{const f=e.target.files[0];if(f&&photoKid)openFace(photoKid,f)});
 
 /* ---- Cắt ảnh mặt bé ---- */
