@@ -1,0 +1,1020 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Hệ Mặt Trời">
+<meta name="theme-color" content="#02030a">
+<title>Khám Phá Hệ Mặt Trời</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" href="icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Be+Vietnam+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --glass:rgba(12,18,40,.62); --glass2:rgba(255,255,255,.07); --line:rgba(150,180,255,.18);
+  --ink:#eef3ff; --dim:#9fb0d6; --accent:#ffcf4a; --accent2:#5fd0ff;
+  --sat:env(safe-area-inset-top); --sab:env(safe-area-inset-bottom); --sal:env(safe-area-inset-left); --sar:env(safe-area-inset-right);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:#02030a;color:var(--ink);overflow:hidden;font-family:'Be Vietnam Pro',system-ui,sans-serif;-webkit-user-select:none;user-select:none;touch-action:none}
+canvas#c{position:fixed;inset:0;width:100vw;height:100dvh;display:block}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;touch-action:manipulation}
+.glass{background:var(--glass);-webkit-backdrop-filter:blur(14px) saturate(1.3);backdrop-filter:blur(14px) saturate(1.3);border:1px solid var(--line)}
+
+/* ---- top bar ---- */
+#top{position:fixed;top:calc(var(--sat) + 12px);left:calc(var(--sal) + 12px);right:calc(var(--sar) + 12px);display:flex;gap:10px;align-items:center;pointer-events:none;z-index:5}
+#top>*{pointer-events:auto}
+#brand{display:flex;align-items:center;gap:10px;padding:8px 16px 8px 10px;border-radius:999px;font-family:'Baloo 2';font-weight:800;font-size:20px;letter-spacing:.2px;white-space:nowrap}
+#brand i{font-style:normal;font-size:24px}
+#seg{display:flex;padding:4px;border-radius:999px;gap:2px;margin-left:auto}
+#seg button{padding:9px 14px;border-radius:999px;font-weight:700;font-size:14px;color:var(--dim);white-space:nowrap;transition:background .25s,color .25s}
+#seg button.on{background:linear-gradient(135deg,#ffd75e,#ff9f2e);color:#2a1500;box-shadow:0 4px 14px rgba(255,170,40,.35)}
+.round{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-size:21px;flex:none}
+
+/* ---- labels ---- */
+#labels{position:fixed;inset:0;pointer-events:none;z-index:2;overflow:hidden}
+.lb{position:absolute;left:0;top:0;pointer-events:auto;will-change:transform}
+.lb>div{transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px}
+.lb .dot{width:10px;height:10px;border-radius:50%;border:2px solid var(--c);box-shadow:0 0 8px var(--c)}
+.lb .nm{font-weight:700;font-size:13px;color:#fff;text-shadow:0 1px 4px #000,0 0 10px #000;white-space:nowrap;padding:1px 8px;border-radius:999px}
+.lb.big .dot{visibility:hidden}
+.lb.sel .nm{background:var(--accent);color:#2a1500;text-shadow:none}
+.lb.hide{display:none}
+
+/* ---- dock ---- */
+#dock{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--sab) + 12px);display:flex;align-items:flex-end;gap:2px;padding:8px 10px 6px;border-radius:26px;z-index:4;max-width:calc(100vw - 24px);overflow-x:auto;scrollbar-width:none;transition:left .45s cubic-bezier(.2,.8,.2,1),opacity .3s,transform .3s}
+#dock::-webkit-scrollbar{display:none}
+#dock button{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:5px;min-width:64px;padding:4px 4px 2px;border-radius:16px;transition:background .2s,transform .15s}
+#dock button:active{transform:scale(.92)}
+#dock button.on{background:rgba(255,207,74,.18)}
+#dock button.on span{color:var(--accent)}
+#dock span{font-size:11.5px;font-weight:700;color:var(--dim);max-width:70px;text-align:center;line-height:1.15}
+.ball{position:relative;border-radius:50%;flex:none;background:radial-gradient(circle at 34% 30%,var(--a) 0%,var(--b) 48%,var(--d) 100%);box-shadow:inset -3px -4px 8px rgba(0,0,0,.45),0 0 12px color-mix(in srgb,var(--b) 40%,transparent)}
+.ball.sun{box-shadow:0 0 18px #ffb300,0 0 36px rgba(255,140,0,.5)}
+.ball.ring::after{content:'';position:absolute;left:50%;top:50%;width:200%;height:52%;border-radius:50%;border:3px solid rgba(230,205,150,.85);transform:translate(-50%,-50%) rotate(-18deg);box-sizing:border-box}
+
+/* ---- time bar ---- */
+#time{position:fixed;left:calc(var(--sal) + 12px);bottom:calc(var(--sab) + 104px);display:flex;align-items:center;gap:4px;padding:5px;border-radius:999px;z-index:4}
+#time .date{padding:0 10px 0 8px;font-weight:700;font-size:14px;min-width:118px;text-align:center;font-variant-numeric:tabular-nums}
+#time button{padding:7px 11px;border-radius:999px;font-size:13px;font-weight:700;color:var(--dim);white-space:nowrap}
+#time button.on{background:var(--glass2);color:#fff;box-shadow:inset 0 0 0 1px var(--line)}
+
+/* ---- hint ---- */
+#hint{position:fixed;left:50%;top:calc(var(--sat) + 74px);transform:translate(-50%,-10px);max-width:min(560px,calc(100vw - 24px));padding:12px 18px;border-radius:18px;font-size:15px;line-height:1.45;text-align:center;opacity:0;transition:opacity .4s,transform .4s;z-index:4;pointer-events:none}
+#hint.show{opacity:1;transform:translate(-50%,0)}
+
+/* ---- info panel ---- */
+#panel{position:fixed;z-index:6;top:calc(var(--sat) + 70px);right:calc(var(--sar) + 12px);bottom:calc(var(--sab) + 12px);width:370px;border-radius:26px;display:flex;flex-direction:column;overflow:hidden;transform:translateX(calc(100% + 30px));transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+body.open #panel{transform:none}
+#phead{display:flex;align-items:center;gap:14px;padding:18px 16px 12px 18px}
+#phead .ball{width:58px;height:58px}
+#phead h2{margin:0;font-family:'Baloo 2';font-weight:800;font-size:30px;line-height:1}
+#phead p{margin:4px 0 0;color:var(--dim);font-size:13.5px;font-weight:600}
+#phead .round{margin-left:auto;width:42px;height:42px;font-size:18px;background:var(--glass2)}
+#pbody{flex:1;overflow-y:auto;padding:4px 16px 16px;touch-action:pan-y;-webkit-overflow-scrolling:touch}
+.actions{display:flex;gap:8px;margin-bottom:14px}
+.actions button{flex:1;padding:12px 10px;border-radius:16px;font-weight:700;font-size:14.5px;background:var(--glass2);box-shadow:inset 0 0 0 1px var(--line)}
+.actions button.main{background:linear-gradient(135deg,#ffd75e,#ff9f2e);color:#2a1500;box-shadow:0 6px 18px rgba(255,170,40,.3)}
+.actions button.playing{animation:pulse 1s infinite}
+@keyframes pulse{50%{filter:brightness(1.2);transform:scale(1.02)}}
+h3{font-family:'Baloo 2';font-size:18px;margin:16px 0 8px;color:var(--accent)}
+.facts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.facts li{background:var(--glass2);border-radius:14px;padding:10px 12px 10px 40px;position:relative;font-size:14.5px;line-height:1.45}
+.facts li::before{content:'✨';position:absolute;left:12px;top:9px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat{background:var(--glass2);border-radius:14px;padding:10px 12px}
+.stat .e{font-size:20px}
+.stat .k{font-size:11.5px;color:var(--dim);font-weight:600;margin-top:2px}
+.stat .v{font-size:14.5px;font-weight:700;margin-top:2px;line-height:1.3}
+.stat.w{grid-column:1/-1}
+.cmp{display:flex;align-items:flex-end;justify-content:center;gap:28px;background:var(--glass2);border-radius:14px;padding:16px 10px 10px;min-height:120px}
+.cmp>div{display:flex;flex-direction:column;align-items:center;gap:8px;font-size:12.5px;font-weight:700;color:var(--dim)}
+.cmp .note{font-size:12.5px;color:var(--dim);text-align:center;margin-top:6px}
+.nav{display:flex;gap:8px;margin-top:16px}
+.nav button{flex:1;padding:11px;border-radius:14px;background:var(--glass2);font-weight:700;font-size:13.5px;box-shadow:inset 0 0 0 1px var(--line)}
+
+/* panel opens: keep dock clear of it on wide screens */
+@media (min-width:760px){
+  body.open #dock{left:calc((100vw - 394px)/2);max-width:calc(100vw - 420px)}
+  body.open #hint{left:calc((100vw - 394px)/2)}
+}
+/* phones: bottom sheet */
+@media (max-width:759px){
+  #brand{display:none}
+  #seg{margin-left:0;flex:1;justify-content:space-between}
+  #seg button{padding:9px 8px;font-size:12.5px;flex:1}
+  #panel{left:calc(var(--sal) + 8px);right:calc(var(--sar) + 8px);top:auto;bottom:0;width:auto;height:58dvh;border-radius:26px 26px 0 0;transform:translateY(105%);padding-bottom:var(--sab)}
+  body.open #dock,body.open #time{opacity:0;pointer-events:none;transform:translateX(-50%) translateY(30px)}
+  body.open #time{transform:translateY(30px)}
+  #phead h2{font-size:26px}
+  #time{bottom:calc(var(--sab) + 100px)}
+  #time span{display:none}
+  #time .date{min-width:0;font-size:13px}
+  #home{display:none}
+  #top .round{width:42px;height:42px;font-size:19px}
+  #hint{top:calc(var(--sat) + 70px)}
+}
+
+/* ---- loading / start ---- */
+#start{position:fixed;inset:0;z-index:10;display:grid;place-items:center;background:radial-gradient(ellipse at 50% 40%,#14204a 0%,#050816 60%,#000 100%);transition:opacity .8s}
+#start.gone{opacity:0;pointer-events:none}
+#start .box{text-align:center;padding:24px}
+#start h1{font-family:'Baloo 2';font-weight:800;font-size:clamp(34px,7vw,64px);margin:10px 0 4px;background:linear-gradient(180deg,#fff,#ffd36a);-webkit-background-clip:text;background-clip:text;color:transparent}
+#start p{color:var(--dim);margin:0 0 26px;font-size:16px}
+#start .orb{width:120px;height:120px;margin:0 auto;position:relative;animation:spin 14s linear infinite}
+#start .orb .ball{position:absolute}
+@keyframes spin{to{transform:rotate(360deg)}}
+#go{padding:16px 40px;border-radius:999px;font-family:'Baloo 2';font-weight:800;font-size:24px;background:linear-gradient(135deg,#ffd75e,#ff9f2e);color:#2a1500;box-shadow:0 10px 30px rgba(255,170,40,.4);opacity:.4;transition:opacity .3s,transform .15s}
+#go:active{transform:scale(.95)}
+#go.ready{opacity:1}
+#bar{width:220px;height:6px;border-radius:9px;background:rgba(255,255,255,.1);margin:18px auto 0;overflow:hidden}
+#bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
+#err{color:#ff9a9a;font-size:14px;margin-top:14px}
+</style>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="labels"></div>
+
+<div id="top">
+  <div id="brand" class="glass"><i>🪐</i>Khám phá Hệ Mặt Trời</div>
+  <div id="seg" class="glass">
+    <button data-m="easy" class="on">🪐 Dễ nhìn</button>
+    <button data-m="real">📏 Tỷ lệ thật</button>
+    <button data-m="compare">⚖️ So kích thước</button>
+  </div>
+  <button id="home" class="round glass" title="Xem toàn cảnh">🏠</button>
+  <button id="mute" class="round glass" title="Bật/tắt giọng đọc">🔊</button>
+</div>
+
+<div id="hint" class="glass"></div>
+
+<div id="time" class="glass">
+  <div class="date" id="date">--/--/----</div>
+  <button data-s="0">⏸</button>
+  <button data-s="1">🐢<span> Chậm</span></button>
+  <button data-s="8" class="on">🐇<span> Vừa</span></button>
+  <button data-s="60">🚀<span> Nhanh</span></button>
+</div>
+
+<nav id="dock" class="glass"></nav>
+
+<aside id="panel" class="glass">
+  <div id="phead">
+    <div class="ball" id="pball"></div>
+    <div><h2 id="pname"></h2><p id="ptype"></p></div>
+    <button class="round" id="close" title="Đóng">✕</button>
+  </div>
+  <div id="pbody"></div>
+</aside>
+
+<div id="start">
+  <div class="box">
+    <div class="orb" id="orb"></div>
+    <h1>Khám phá Hệ Mặt Trời</h1>
+    <p id="msg">Đang chuẩn bị các hành tinh…</p>
+    <button id="go">🚀 Bắt đầu</button>
+    <div id="bar"><i></i></div>
+    <div id="err"></div>
+  </div>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+
+const $ = s => document.querySelector(s);
+const V3 = THREE.Vector3;
+const lerp = (a, b, t) => a + (b - a) * t;
+const logLerp = (a, b, t) => Math.exp(lerp(Math.log(a), Math.log(b), t));
+const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+const DEG = Math.PI / 180;
+
+/* ================= SỐ LIỆU THẬT ================= */
+const ER = 6371, AU = 149597870;           // bán kính Trái Đất (km), 1 đơn vị thiên văn (km)
+const ORDER = ['sun', 'mercury', 'venus', 'earth', 'moon', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
+// r: bán kính km, a: khoảng cách tới Mặt Trời (AU), P: chu kỳ quỹ đạo (ngày), rot: chu kỳ tự quay (ngày), tilt: độ nghiêng trục, L0: kinh độ trung bình năm 2000
+const B = {
+  sun:     {r: 696340, rot: 25.4,  tilt: 7.25},
+  mercury: {r: 2440,  a: 0.387,  P: 87.969,   rot: 58.65,  tilt: 0.03,  L0: 252.25, g: .38},
+  venus:   {r: 6052,  a: 0.723,  P: 224.701,  rot: 243.02, tilt: 177.4, L0: 181.98, g: .9},
+  earth:   {r: 6371,  a: 1.0,    P: 365.256,  rot: 0.9973, tilt: 23.44, L0: 100.46, g: 1},
+  moon:    {r: 1737,  km: 384400, P: 27.32,   rot: 27.32,  tilt: 6.7,  L0: 218.3, g: .17},
+  mars:    {r: 3390,  a: 1.524,  P: 686.98,   rot: 1.026,  tilt: 25.19, L0: 355.45, g: .38},
+  jupiter: {r: 69911, a: 5.203,  P: 4332.59,  rot: 0.4135, tilt: 3.13,  L0: 34.40,  g: 2.53},
+  saturn:  {r: 58232, a: 9.537,  P: 10759.22, rot: 0.444,  tilt: 26.73, L0: 49.94,  g: 1.07},
+  uranus:  {r: 25362, a: 19.19,  P: 30688.5,  rot: 0.718,  tilt: 97.77, L0: 313.23, g: .89},
+  neptune: {r: 24622, a: 30.07,  P: 60182,    rot: 0.671,  tilt: 28.32, L0: 304.88, g: 1.14},
+};
+B.sun.g = 27.9;
+const PLANETS = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
+
+/* 3 cách xếp:
+   easy    – dễ nhìn: hành tinh phóng to, khoảng cách thu gọn (như các app thiên văn)
+   real    – tỷ lệ thật: 1 đơn vị = bán kính Trái Đất, cả kích thước lẫn khoảng cách đều thật
+   compare – xếp hàng cạnh nhau, đúng kích thước thật */
+const RE = id => id === 'sun' ? 15 : id === 'moon' ? .75 : 2.2 * Math.sqrt(B[id].r / ER);
+const DE = a => 18 + 40 * Math.pow(a, .6);
+const MOON_E = 3.8, MOON_R = B.moon.km / ER;
+const CMP = {};
+{
+  CMP.sun = new V3(-B.sun.r / ER, 0, 0);
+  let x = 0;
+  for (const id of PLANETS) {
+    const R = B[id].r / ER, w = id === 'saturn' ? R * 2.3 : R;
+    x += 1.8 + w; CMP[id] = new V3(x, 0, 0); x += w;
+  }
+  CMP.moon = CMP.earth.clone().add(new V3(0, 2.6, 0));
+  CMP.end = x;
+}
+const CMP_LIGHT = new V3(CMP.end * .3, 120, 420);
+
+/* ================= DỮ LIỆU NỘI DUNG ================= */
+let D;
+try { D = await fetch('data.json').then(r => r.json()); }
+catch (e) { $('#err').textContent = 'Không tải được dữ liệu, bé nhờ bố mẹ kiểm tra mạng nhé.'; throw e; }
+
+const ballStyle = (id, px) => {
+  const m = D[id].mau;
+  return `width:${px}px;height:${px}px;--a:${m[0]};--b:${m[1]};--d:${m[2]}`;
+};
+const ballCls = id => 'ball' + (id === 'sun' ? ' sun' : '') + (id === 'saturn' ? ' ring' : '');
+
+// quả cầu nhỏ xoay ở màn mở đầu
+$('#orb').innerHTML = ['sun', 'earth', 'saturn', 'mars', 'neptune'].map((id, i) => {
+  const s = id === 'sun' ? 44 : 22, ang = (i - 1) * 90 * DEG, r = 52;
+  const x = id === 'sun' ? 60 - s / 2 : 60 + Math.cos(ang) * r - s / 2, y = id === 'sun' ? 60 - s / 2 : 60 + Math.sin(ang) * r - s / 2;
+  return `<div class="${ballCls(id)}" style="${ballStyle(id, s)};left:${x}px;top:${y}px"></div>`;
+}).join('');
+
+/* ================= TIẾNG ================= */
+const voice = new Audio(); voice.preload = 'auto';
+let muted = false;
+try { muted = localStorage.getItem('hmt_mute') === '1'; } catch (e) {}
+const setMuteUI = () => $('#mute').textContent = muted ? '🔇' : '🔊';
+setMuteUI();
+function say(name) {
+  stopVoice();
+  if (muted) return;
+  voice.src = 'audio/' + name + '.mp3';
+  voice.play().then(() => markPlaying(true)).catch(() => speakFallback(name));
+}
+function stopVoice() { voice.pause(); if ('speechSynthesis' in window) speechSynthesis.cancel(); markPlaying(false); }
+voice.addEventListener('ended', () => markPlaying(false));
+function speakFallback(name) {          // không có file thì dùng giọng Việt của máy, tuyệt đối không đọc giọng Anh
+  if (!('speechSynthesis' in window)) return;
+  const v = speechSynthesis.getVoices().find(v => /^vi/i.test(v.lang));
+  if (!v) return;
+  const text = D[name] ? D[name].doc.join(' ') : (D._cau[name] || '');
+  const u = new SpeechSynthesisUtterance(text); u.voice = v; u.lang = 'vi-VN'; u.rate = .95;
+  u.onend = () => markPlaying(false);
+  speechSynthesis.speak(u); markPlaying(true);
+}
+function markPlaying(on) { const b = $('#listen'); if (b) b.classList.toggle('playing', on); }
+
+// tiếng "vút" khi bay tới hành tinh (tự tạo, không cần file)
+let ac;
+function whoosh() {
+  if (muted) return;
+  try {
+    ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+    const len = ac.sampleRate * 1.1, buf = ac.createBuffer(1, len, ac.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.sin(Math.PI * i / len) ** 2;
+    const src = ac.createBufferSource(); src.buffer = buf;
+    const f = ac.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = 1.4;
+    f.frequency.setValueAtTime(300, ac.currentTime); f.frequency.exponentialRampToValueAtTime(1800, ac.currentTime + .6); f.frequency.exponentialRampToValueAtTime(400, ac.currentTime + 1.1);
+    const g = ac.createGain(); g.gain.value = .16;
+    src.connect(f).connect(g).connect(ac.destination); src.start();
+  } catch (e) {}
+}
+
+/* ================= KẾT XUẤT 3D ================= */
+const canvas = $('#c');
+const renderer = new THREE.WebGLRenderer({canvas, antialias: true, logarithmicDepthBuffer: true, powerPreference: 'high-performance'});
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+const DPR = renderer.getPixelRatio();
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, 1, 0.01, 1e9);
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true; controls.dampingFactor = .08; controls.rotateSpeed = .6; controls.zoomSpeed = 1.1;
+controls.screenSpacePanning = true; controls.enablePan = true;
+
+const sunLight = new THREE.PointLight(0xfff4e6, 3.7, 0, 0);
+scene.add(sunLight);
+const amb = new THREE.AmbientLight(0x8a9ccc, .35);
+scene.add(amb);
+
+/* ---------- nhiễu để vẽ bề mặt hành tinh ---------- */
+function h3(x, y, z, s) {
+  let h = Math.imul(x, 374761393) ^ Math.imul(y, 668265263) ^ Math.imul(z, 1274126177) ^ Math.imul(s, 1103515245);
+  h = Math.imul(h ^ (h >>> 13), 1274126177);
+  return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
+}
+function vnoise(x, y, z, s) {
+  const xi = Math.floor(x), yi = Math.floor(y), zi = Math.floor(z);
+  let xf = x - xi, yf = y - yi, zf = z - zi;
+  const u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf), w = zf * zf * (3 - 2 * zf);
+  const a = h3(xi, yi, zi, s), b = h3(xi + 1, yi, zi, s), c = h3(xi, yi + 1, zi, s), d = h3(xi + 1, yi + 1, zi, s);
+  const e = h3(xi, yi, zi + 1, s), f = h3(xi + 1, yi, zi + 1, s), g = h3(xi, yi + 1, zi + 1, s), hh = h3(xi + 1, yi + 1, zi + 1, s);
+  return lerp(lerp(lerp(a, b, u), lerp(c, d, u), v), lerp(lerp(e, f, u), lerp(g, hh, u), v), w);
+}
+function fbm(x, y, z, oct = 5, s = 1) {
+  let sum = 0, amp = .5, f = 1, n = 0;
+  for (let i = 0; i < oct; i++) { sum += amp * vnoise(x * f, y * f, z * f, s + i * 31); n += amp; amp *= .5; f *= 2.03; }
+  return sum / n;
+}
+const hex = c => { const n = parseInt(c.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
+const mix = (a, b, t) => [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)];
+function ramp(stops, t) {
+  t = clamp(t, 0, 1) * (stops.length - 1);
+  const i = Math.min(Math.floor(t), stops.length - 2);
+  return mix(stops[i], stops[i + 1], t - i);
+}
+const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+
+// vẽ ảnh bề mặt dạng trải phẳng (kinh độ × vĩ độ), lấy mẫu trên mặt cầu nên không bị nối
+function paint(w, h, fn) {
+  const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+  const ctx = cv.getContext('2d'), img = ctx.createImageData(w, h), d = img.data;
+  for (let j = 0; j < h; j++) {
+    const lat = (.5 - (j + .5) / h) * Math.PI, cl = Math.cos(lat), y = Math.sin(lat);
+    for (let i = 0; i < w; i++) {
+      const lon = (i + .5) / w * Math.PI * 2;
+      const c = fn(cl * Math.cos(lon), y, cl * Math.sin(lon), lat, lon);
+      const k = (j * w + i) * 4;
+      d[k] = c[0]; d[k + 1] = c[1]; d[k + 2] = c[2]; d[k + 3] = c[3] ?? 255;
+    }
+  }
+  ctx.putImageData(img, 0, 0);
+  const t = new THREE.CanvasTexture(cv);
+  t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4;
+  return t;
+}
+function craters(n, seed, minR, maxR) {
+  const list = [];
+  for (let i = 0; i < n; i++) {
+    const u = h3(i, 1, 7, seed) * 2 - 1, th = h3(i, 2, 7, seed) * Math.PI * 2, s = Math.sqrt(1 - u * u);
+    const r = minR + Math.pow(h3(i, 3, 7, seed), 3) * (maxR - minR);
+    list.push([s * Math.cos(th), u, s * Math.sin(th), r]);
+  }
+  return list;
+}
+function craterShade(cr, x, y, z) {
+  let m = 1;
+  for (const c of cr) {
+    const dy = y - c[1]; if (dy > c[3] * 1.3 || dy < -c[3] * 1.3) continue;
+    const dd = Math.sqrt((x - c[0]) ** 2 + dy * dy + (z - c[2]) ** 2) / c[3];
+    if (dd < 1.25) m *= dd < .9 ? .78 + .14 * dd * dd : dd < 1.05 ? 1.18 : 1 + .18 * (1.25 - dd) / .2;
+  }
+  return m;
+}
+
+const TEX = {
+  sun: () => {
+    const st = ['#d24a00', '#ff7a00', '#ffab2e', '#ffd666', '#fff4c4'].map(hex);
+    return paint(1024, 512, (x, y, z) => {
+      const big = fbm(x * 2.5, y * 2.5, z * 2.5, 4, 3), gran = fbm(x * 22, y * 22, z * 22, 3, 9);
+      return ramp(st, .15 + big * .55 + gran * .45);
+    });
+  },
+  mercury: () => {
+    const cr = craters(170, 5, .015, .16), st = ['#3f3b37', '#6e6862', '#9a938a', '#c2bab0'].map(hex);
+    return paint(1024, 512, (x, y, z) => {
+      const n = fbm(x * 3, y * 3, z * 3, 6, 11);
+      const c = ramp(st, n * 1.1 - .05);
+      const m = craterShade(cr, x, y, z);
+      return [c[0] * m, c[1] * m, c[2] * m];
+    });
+  },
+  venus: () => {
+    const st = ['#a8743a', '#d9a45f', '#ecc986', '#f8e6b8', '#fff6dc'].map(hex);
+    return paint(1024, 512, (x, y, z) => {
+      const q = fbm(x * 2, y * 2, z * 2, 4, 21);
+      const n = fbm(x * 1.6 + q * 2.2, y * 7 + q * 1.5, z * 1.6 + q * 2.2, 5, 23);
+      return ramp(st, n * 1.25 - .1);
+    });
+  },
+  earth: () => {           // dự phòng khi không tải được ảnh vệ tinh thật
+    const sea = ['#0b2a66', '#14509e'].map(hex), land = ['#2f6b2a', '#6b8f3a', '#a08955', '#d6cfa8'].map(hex);
+    return paint(1024, 512, (x, y, z, lat) => {
+      const n = fbm(x * 2.2, y * 2.2, z * 2.2, 6, 41);
+      let c = n > .53 ? ramp(land, (n - .53) * 4 + Math.abs(lat) * .3) : mix(sea[0], sea[1], n * 1.6);
+      if (Math.abs(y) > .92 + (n - .5) * .08) c = [235, 242, 250];
+      return c;
+    });
+  },
+  moon: () => {
+    const cr = craters(220, 9, .01, .14), st = ['#4a4a4a', '#7a7a7a', '#a5a5a5', '#cfcfcf'].map(hex);
+    return paint(1024, 512, (x, y, z) => {
+      const maria = fbm(x * 1.4, y * 1.4, z * 1.4, 4, 61), n = fbm(x * 6, y * 6, z * 6, 4, 63);
+      const c = ramp(st, n * .7 + (maria > .55 ? -.25 : .15));
+      const m = craterShade(cr, x, y, z);
+      return [c[0] * m, c[1] * m, c[2] * m];
+    });
+  },
+  mars: () => {
+    const st = ['#3d1608', '#7a2a0e', '#b4471b', '#cf6a35', '#e5946a'].map(hex);
+    const cr = craters(60, 13, .01, .06);
+    return paint(1024, 512, (x, y, z) => {
+      const big = fbm(x * 1.5, y * 1.5, z * 1.5, 5, 71), n = fbm(x * 5, y * 5, z * 5, 5, 73);
+      let c = ramp(st, big * .9 + n * .45 - .12);
+      const m = craterShade(cr, x, y, z); c = [c[0] * m, c[1] * m, c[2] * m];
+      const cap = smooth(.9, .95, Math.abs(y) + (n - .5) * .06);
+      return mix(c, [245, 240, 235], cap);
+    });
+  },
+  jupiter: () => {
+    const zone = hex('#f1e4cb'), zone2 = hex('#e6cfa4'), belt = hex('#c0905f'), belt2 = hex('#a06c48'), pole = hex('#8e8072'), spot = hex('#c35a3c');
+    return paint(1024, 512, (x, y, z, lat, lon) => {
+      const t = fbm(x * 3, y * 3, z * 3, 4, 81);
+      const yy = y + (t - .5) * .09;
+      const band = .5 + .5 * Math.sin(yy * 23 + Math.sin(yy * 9) * 1.4);
+      const fine = fbm(x * 2, y * 60, z * 2, 3, 83);
+      let c = mix(mix(zone, zone2, fine), mix(belt, belt2, fine), smooth(.4, .85, band) * .85);
+      c = mix(c, zone, smooth(.12, 0, Math.abs(y)) * .6);
+      c = mix(c, pole, smooth(.6, .95, Math.abs(y)));
+      // Vết Đỏ Lớn
+      let dl = lon - 4.0; dl = Math.atan2(Math.sin(dl), Math.cos(dl));
+      const dx = dl / (13 * DEG), dy = (lat + 22 * DEG) / (6.5 * DEG), e = dx * dx + dy * dy;
+      if (e < 1.6) {
+        const sw = fbm(dx * 3 + e * 2, dy * 3, 3, 3, 87);
+        c = mix(c, mix(spot, hex('#e7a07a'), sw * .7 + (e < .35 ? .3 : 0)), smooth(1.6, .7, e));
+      }
+      return c;
+    });
+  },
+  saturn: () => {
+    const st = ['#c7a66b', '#dcc08a', '#eedbab', '#f6e8c4'].map(hex), pole = hex('#a9a28a');
+    return paint(1024, 512, (x, y, z) => {
+      const t = fbm(x * 3, y * 3, z * 3, 3, 91);
+      const yy = y + (t - .5) * .04;
+      const band = .5 + .5 * Math.sin(yy * 31 + Math.sin(yy * 7) * 2);
+      const fine = fbm(x * 2, y * 70, z * 2, 3, 93);
+      let c = ramp(st, band * .55 + fine * .45 + .05);
+      return mix(c, pole, smooth(.75, .98, Math.abs(y)));
+    });
+  },
+  uranus: () => {
+    const a = hex('#9bd9e0'), b = hex('#b6eef2'), p = hex('#d4f6f7');
+    return paint(512, 256, (x, y, z) => {
+      const band = .5 + .5 * Math.sin(y * 18), n = fbm(x * 3, y * 12, z * 3, 3, 101);
+      return mix(mix(a, b, band * .35 + n * .3), p, smooth(.6, 1, y) * .7);
+    });
+  },
+  neptune: () => {
+    const a = hex('#2a46c8'), b = hex('#4572f2'), w = hex('#e8f0ff'), dark = hex('#14216e');
+    return paint(1024, 512, (x, y, z, lat, lon) => {
+      const t = fbm(x * 3, y * 3, z * 3, 4, 111);
+      const band = .5 + .5 * Math.sin((y + (t - .5) * .1) * 16);
+      let c = mix(a, b, band * .6 + t * .4);
+      const streak = fbm(x * 3, y * 40, z * 3, 3, 113);
+      c = mix(c, w, smooth(.66, .8, streak) * .8);
+      let dl = lon - 2.2; dl = Math.atan2(Math.sin(dl), Math.cos(dl));
+      const e = (dl / (12 * DEG)) ** 2 + ((lat + 20 * DEG) / (6 * DEG)) ** 2;
+      return mix(c, dark, smooth(1.2, .5, e) * .85);
+    });
+  },
+};
+
+function ringTexture(kind) {
+  const W = 1024, cv = document.createElement('canvas'); cv.width = W; cv.height = 4;
+  const ctx = cv.getContext('2d'), img = ctx.createImageData(W, 4), d = img.data;
+  for (let i = 0; i < W; i++) {
+    const u = i / W, n = vnoise(u * 180, 0, 0, 7) * .5 + vnoise(u * 40, 0, 0, 8) * .5;
+    let a, c;
+    if (kind === 'saturn') {
+      if (u < .2) { a = .18 + n * .15; c = [140, 125, 105]; }                 // vành C
+      else if (u < .55) { a = .75 + n * .25; c = mix([215, 195, 155], [240, 225, 190], n); } // vành B
+      else if (u < .6) { a = .06; c = [90, 80, 70]; }                          // khe Cassini
+      else if (u < .93) { a = .55 + n * .25; c = mix([195, 178, 145], [225, 210, 175], n); } // vành A
+      else if (u < .96) { a = .05; c = [90, 80, 70]; }
+      else if (u < .975) { a = .5; c = [220, 210, 190]; }                       // vành F
+      else { a = 0; c = [0, 0, 0]; }
+      if (u > .86 && u < .87) a *= .2;                                         // khe Encke
+    } else {
+      a = (Math.abs(u - .55) < .03 || Math.abs(u - .82) < .02 || Math.abs(u - .3) < .015) ? .45 : .04; c = [180, 200, 210];
+    }
+    for (let j = 0; j < 4; j++) { const k = (j * W + i) * 4; d[k] = c[0]; d[k + 1] = c[1]; d[k + 2] = c[2]; d[k + 3] = a * 255; }
+  }
+  ctx.putImageData(img, 0, 0);
+  const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+function ringMesh(kind, inner, outer) {
+  const g = new THREE.RingGeometry(inner, outer, 160, 1);
+  const p = g.attributes.position, uv = g.attributes.uv, v = new V3();
+  for (let i = 0; i < p.count; i++) { v.fromBufferAttribute(p, i); uv.setXY(i, (v.length() - inner) / (outer - inner), .5); }
+  const m = new THREE.MeshStandardMaterial({map: ringTexture(kind), transparent: true, side: THREE.DoubleSide, roughness: 1, metalness: 0, depthWrite: false});
+  const mesh = new THREE.Mesh(g, m); mesh.rotation.x = -Math.PI / 2; return mesh;
+}
+
+/* ---------- shader: Mặt Trời và lớp khí quyển ---------- */
+const VS = `#include <common>
+#include <logdepthbuf_pars_vertex>
+varying vec2 vUv; varying vec3 vN; varying vec3 vV;
+void main(){ vUv=uv; vec4 mv=modelViewMatrix*vec4(position,1.); vN=normalize(normalMatrix*normal); vV=normalize(-mv.xyz); gl_Position=projectionMatrix*mv;
+#include <logdepthbuf_vertex>
+}`;
+const sunMat = new THREE.ShaderMaterial({
+  uniforms: {map: {value: null}, time: {value: 0}},
+  vertexShader: VS,
+  fragmentShader: `#include <common>
+#include <logdepthbuf_pars_fragment>
+uniform sampler2D map; uniform float time; varying vec2 vUv; varying vec3 vN; varying vec3 vV;
+void main(){
+#include <logdepthbuf_fragment>
+  float mu=max(dot(normalize(vN),normalize(vV)),0.);
+  vec3 a=texture2D(map,vUv+vec2(time*.004,0.)).rgb, b=texture2D(map,vUv*vec2(1.,1.)+vec2(-time*.003,.01)).rgb;
+  vec3 c=mix(a,b,.35+.15*sin(time*.7));
+  c*=.8+.5*pow(mu,.5); c+=vec3(1.,.6,.2)*pow(1.-mu,2.5)*.5;
+  gl_FragColor=vec4(c*1.3,1.);
+#include <colorspace_fragment>
+}`,
+});
+function atmo(color, power, strength, scale) {
+  const m = new THREE.ShaderMaterial({
+    uniforms: {c: {value: new THREE.Color(color)}, p: {value: power}, s: {value: strength}},
+    vertexShader: VS,
+    fragmentShader: `#include <common>
+#include <logdepthbuf_pars_fragment>
+uniform vec3 c; uniform float p; uniform float s; varying vec2 vUv; varying vec3 vN; varying vec3 vV;
+void main(){
+#include <logdepthbuf_fragment>
+  float f=pow(1.-abs(dot(normalize(vN),normalize(vV))),p);
+  gl_FragColor=vec4(c*f*s,f*s);
+#include <colorspace_fragment>
+}`,
+    transparent: true, blending: THREE.AdditiveBlending, depthWrite: false,
+  });
+  const mesh = new THREE.Mesh(new THREE.SphereGeometry(1, 64, 32), m);
+  mesh.scale.setScalar(scale); return mesh;
+}
+function glowSprite(inner, outer) {
+  const cv = document.createElement('canvas'); cv.width = cv.height = 256;
+  const ctx = cv.getContext('2d'), g = ctx.createRadialGradient(128, 128, 0, 128, 128, 128);
+  g.addColorStop(0, inner); g.addColorStop(.25, inner); g.addColorStop(.5, outer); g.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, 256, 256);
+  const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace;
+  return new THREE.SpriteMaterial({map: t, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true});
+}
+
+/* ---------- bầu trời sao ---------- */
+const sky = new THREE.Group(); scene.add(sky);
+{
+  const mk = (n, size, seed) => {
+    const pos = new Float32Array(n * 3), col = new Float32Array(n * 3);
+    for (let i = 0; i < n; i++) {
+      const u = h3(i, 1, seed, 3) * 2 - 1, th = h3(i, 2, seed, 3) * Math.PI * 2, s = Math.sqrt(1 - u * u);
+      // dồn nhiều sao về dải Ngân Hà
+      let x = s * Math.cos(th), y = u, z = s * Math.sin(th);
+      pos.set([x * 900, y * 900, z * 900], i * 3);
+      const k = h3(i, 4, seed, 3), b = .55 + h3(i, 5, seed, 3) * .45;
+      const c = k < .15 ? [.7, .8, 1] : k < .25 ? [1, .85, .7] : [1, 1, 1];
+      col.set([c[0] * b, c[1] * b, c[2] * b], i * 3);
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    const p = new THREE.Points(g, new THREE.PointsMaterial({size: size * DPR, sizeAttenuation: false, vertexColors: true, depthTest: false, depthWrite: false}));
+    p.renderOrder = -1; p.frustumCulled = false; return p;
+  };
+  sky.add(mk(5000, 1.1, 1), mk(600, 2.1, 2), mk(80, 3, 3));
+}
+let milky;   // dải Ngân Hà mờ (vẽ khi tải)
+function makeMilky() {
+  const tex = paint(1024, 512, (x, y, z) => {
+    const band = Math.exp(-(y * y) / .018), n = fbm(x * 4, y * 4, z * 4, 5, 131), dust = fbm(x * 9, y * 9, z * 9, 3, 133);
+    const v = band * (n * .9 + .1) * (1 - smooth(.45, .7, dust) * .6 * band);
+    return [lerp(4, 70, v), lerp(5, 64, v), lerp(12, 88, v)];
+  });
+  milky = new THREE.Mesh(new THREE.SphereGeometry(950, 48, 24), new THREE.MeshBasicMaterial({map: tex, side: THREE.BackSide, depthTest: false, depthWrite: false}));
+  milky.rotation.set(1.05, .4, .3); milky.renderOrder = -2; milky.frustumCulled = false;
+  sky.add(milky);
+}
+
+/* ---------- dựng các thiên thể ---------- */
+const bodies = {};
+const SPHERE = new THREE.SphereGeometry(1, 96, 48);
+function makeBody(id) {
+  const b = {id, ...B[id], group: new THREE.Group(), tilt: new THREE.Group(), cur: {pos: new V3(), R: 1}};
+  b.tilt.rotation.z = (B[id].tilt || 0) * DEG;
+  b.group.add(b.tilt); scene.add(b.group);
+  let mat;
+  if (id === 'sun') mat = sunMat;
+  else mat = new THREE.MeshStandardMaterial({roughness: 1, metalness: 0});
+  b.mesh = new THREE.Mesh(SPHERE, mat); b.tilt.add(b.mesh);
+  bodies[id] = b; return b;
+}
+ORDER.forEach(makeBody);
+const sunGlow = new THREE.Sprite(glowSprite('rgba(255,220,140,.9)', 'rgba(255,120,20,.18)')); sunGlow.scale.setScalar(5.2); bodies.sun.group.add(sunGlow);
+const sunGlow2 = new THREE.Sprite(glowSprite('rgba(255,200,120,.25)', 'rgba(255,100,20,.05)')); sunGlow2.scale.setScalar(14); bodies.sun.group.add(sunGlow2);
+const sunStar = new THREE.Sprite(glowSprite('rgba(255,245,210,1)', 'rgba(255,170,60,.35)')); sunStar.material.sizeAttenuation = false; sunStar.scale.setScalar(.07); scene.add(sunStar);
+bodies.earth.tilt.add(atmo('#4d9bff', 2.6, 1.5, 1.035));
+bodies.venus.tilt.add(atmo('#ffd9a0', 2.2, .9, 1.04));
+bodies.mars.tilt.add(atmo('#ff9a6a', 3, .6, 1.025));
+bodies.uranus.tilt.add(atmo('#bff6ff', 2.4, .8, 1.04));
+bodies.neptune.tilt.add(atmo('#6f9bff', 2.4, 1, 1.04));
+bodies.jupiter.tilt.add(atmo('#ffe2b8', 3, .45, 1.02));
+bodies.saturn.tilt.add(atmo('#ffeccc', 3, .45, 1.02));
+bodies.saturn.tilt.add(ringMesh('saturn', 1.24, 2.27));
+bodies.uranus.tilt.add(ringMesh('uranus', 1.6, 2.05));
+
+// đường quỹ đạo
+const circle = (() => { const pts = []; for (let i = 0; i <= 256; i++) { const a = i / 256 * Math.PI * 2; pts.push(new V3(Math.cos(a), 0, -Math.sin(a))); } return new THREE.BufferGeometry().setFromPoints(pts); })();
+for (const id of [...PLANETS, 'moon']) {
+  const m = new THREE.LineBasicMaterial({color: id === 'moon' ? 0x9aa6bf : 0x6c8ad0, transparent: true, opacity: .35, depthWrite: false});
+  bodies[id].orbit = new THREE.Line(circle, m); scene.add(bodies[id].orbit);
+}
+
+// vành đai tiểu hành tinh
+const belt = (() => {
+  const N = 2200, info = [];
+  for (let i = 0; i < N; i++) {
+    const a = 2.15 + (h3(i, 1, 5, 151) + h3(i, 2, 5, 151) + h3(i, 3, 5, 151)) / 3 * 1.15;
+    info.push([a, h3(i, 4, 5, 151) * Math.PI * 2, (h3(i, 5, 5, 151) - .5) * .12]);
+  }
+  const pos = new Float32Array(N * 3), g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  const p = new THREE.Points(g, new THREE.PointsMaterial({size: 1.2 * DPR, sizeAttenuation: false, color: 0xa89a8a, transparent: true, opacity: .75, depthWrite: false}));
+  p.frustumCulled = false; scene.add(p);
+  return {p, info, pos};
+})();
+
+/* ================= VỊ TRÍ THEO TỪNG CÁCH XẾP ================= */
+const J2000 = Date.UTC(2000, 0, 1, 12);
+let simDays = (Date.now() - J2000) / 864e5;
+let speed = 8;             // số ngày trôi qua mỗi giây
+let mode = 'easy', morph = null;   // morph = {from, to, t}
+
+const angle = id => (B[id].L0 + 360 * simDays / B[id].P) * DEG;
+const orbitR = (id, m) => m === 'easy' ? (id === 'moon' ? MOON_E : DE(B[id].a)) : (id === 'moon' ? MOON_R : B[id].a * AU / ER);
+const radius = (id, m) => m === 'easy' ? RE(id) : B[id].r / ER;
+function placeIn(id, m, earthPos) {
+  if (m === 'compare') return CMP[id].clone();
+  if (id === 'sun') return new V3();
+  const th = angle(id), d = orbitR(id, m), p = new V3(Math.cos(th) * d, 0, -Math.sin(th) * d);
+  if (id === 'moon') p.add(earthPos || placeIn('earth', m));
+  return p;
+}
+function cmpFactor() {     // 1 = đang ở chế độ xếp hàng
+  if (!morph) return mode === 'compare' ? 1 : 0;
+  const e = ease(morph.t);
+  return lerp(morph.from === 'compare' ? 1 : 0, morph.to === 'compare' ? 1 : 0, e);
+}
+function update() {
+  const e = morph ? ease(morph.t) : 1, A = morph ? morph.from : mode, Bm = mode;
+  const involvesCmp = A === 'compare' || Bm === 'compare';
+  for (const id of ORDER) {
+    const b = bodies[id];
+    b.cur.R = logLerp(radius(id, A), radius(id, Bm), e);
+    if (!morph || involvesCmp || id === 'sun') {
+      b.cur.pos.lerpVectors(placeIn(id, A), placeIn(id, Bm), e);
+    } else {
+      const base = id === 'moon' ? bodies.earth.cur.pos : new V3();
+      const th = angle(id), d = logLerp(orbitR(id, A), orbitR(id, Bm), e);
+      b.cur.pos.set(Math.cos(th) * d, 0, -Math.sin(th) * d).add(base);
+    }
+    b.group.position.copy(b.cur.pos); b.group.scale.setScalar(b.cur.R);
+    if (b.orbit) {
+      const nonCmpA = A === 'compare' ? Bm : A, nonCmpB = Bm === 'compare' ? A : Bm;
+      b.orbit.scale.setScalar(logLerp(orbitR(id, nonCmpA), orbitR(id, nonCmpB), e));
+      b.orbit.position.copy(id === 'moon' ? bodies.earth.cur.pos : new V3());
+    }
+  }
+  const cf = cmpFactor();
+  for (const id of [...PLANETS, 'moon']) {
+    const o = bodies[id].orbit, sel = focus && (focus.id === id);
+    o.material.opacity = (sel ? .85 : id === 'moon' ? .25 : .32) * (1 - cf);
+    o.material.color.set(sel ? 0xffcf4a : id === 'moon' ? 0x9aa6bf : 0x6c8ad0);
+    o.visible = cf < .99;
+  }
+  // vành đai tiểu hành tinh
+  belt.p.material.opacity = .75 * (1 - cf); belt.p.visible = cf < .99;
+  if (belt.p.visible && (morph || !belt.done || belt.mode !== mode)) {
+    const nA = A === 'compare' ? Bm : A, nB = Bm === 'compare' ? A : Bm;
+    belt.info.forEach(([a, ph, inc], i) => {
+      const dA = nA === 'easy' ? DE(a) : a * AU / ER, dB = nB === 'easy' ? DE(a) : a * AU / ER, d = logLerp(dA, dB, e);
+      belt.pos[i * 3] = Math.cos(ph) * d; belt.pos[i * 3 + 1] = inc * d * .5; belt.pos[i * 3 + 2] = -Math.sin(ph) * d;
+    });
+    belt.p.geometry.attributes.position.needsUpdate = true; belt.done = true; belt.mode = mode;
+  }
+  belt.p.rotation.y = 2 * Math.PI * simDays / 1680;
+  // khi xếp hàng: chiếu sáng từ phía trước để thấy rõ cả hành tinh, tắt quầng sáng Mặt Trời
+  sunLight.position.copy(bodies.sun.cur.pos).lerp(CMP_LIGHT, cf);
+  sunStar.position.copy(bodies.sun.cur.pos);
+  amb.intensity = lerp(.35, .9, cf);
+  sunGlow.material.opacity = 1 - cf; sunGlow2.material.opacity = 1 - cf;
+}
+
+/* ================= CAMERA ================= */
+let focus = null, fly = null, lastFocusR = 1;
+const panelOpen = () => document.body.classList.contains('open');
+function overview(m) {
+  const asp = innerWidth / innerHeight, narrow = asp < 1 ? 1 / asp * .85 : 1;
+  if (m === 'easy') return {target: new V3(0, 0, 0), off: new V3(0, .62, 1).normalize().multiplyScalar(400 * narrow)};
+  if (m === 'real') return {target: new V3(0, 0, 0), off: new V3(0, 1.4, 1).normalize().multiplyScalar(1.7e6 * narrow)};
+  const cx = (CMP.end - 14) / 2, half = (CMP.end + 14) / 2;
+  const dist = half / (Math.tan(22.5 * DEG) * Math.max(asp, .5)) * 1.1;
+  return {target: new V3(cx, 0, 0), off: new V3(0, .18, 1).normalize().multiplyScalar(dist)};
+}
+// khoảng cách camera để hành tinh chiếm vừa phần màn hình còn trống (bảng thông tin che một phần)
+function focusDist(b) {
+  const W = innerWidth, H = innerHeight, wide = W >= 760;
+  const availW = wide ? W - 394 : W, availH = wide ? H : H * .42;
+  let pr = Math.min(availW * .3, availH * .34);
+  if (b.id === 'saturn') pr /= 2.1; else if (b.id === 'sun') pr *= 1.1;
+  return b.cur.R * (H / 2) / (pr * Math.tan(camera.fov / 2 * DEG));
+}
+function startFly(body) {
+  const from = {t: controls.target.clone(), o: camera.position.clone().sub(controls.target)};
+  let dir;
+  if (body) {
+    const cur = from.o.clone().normalize();
+    const toSun = bodies.sun.cur.pos.clone().sub(body.cur.pos);
+    if (toSun.lengthSq() > 1e-6 && body.id !== 'sun') cur.add(toSun.normalize().multiplyScalar(1.1));
+    cur.y = Math.max(cur.y, .12); dir = cur.normalize();
+  }
+  fly = {t: 0, dur: 1.7, from, body, dir};
+  controls.enabled = false;
+}
+function stepCamera(dt) {
+  if (fly) {
+    fly.t = Math.min(1, fly.t + dt / fly.dur);
+    const e = ease(fly.t);
+    let tgt, off;
+    if (fly.body) { tgt = fly.body.cur.pos; off = fly.dir.clone().multiplyScalar(focusDist(fly.body)); }
+    else {
+      const ov = morph ? null : overview(mode);
+      if (ov) { tgt = ov.target; off = ov.off; }
+      else {
+        const a = overview(morph.from), b = overview(mode), me = ease(morph.t);
+        tgt = a.target.clone().lerp(b.target, me);
+        off = a.off.clone().normalize().lerp(b.off.clone().normalize(), me).normalize().multiplyScalar(logLerp(a.off.length(), b.off.length(), me));
+      }
+    }
+    controls.target.lerpVectors(fly.from.t, tgt, e);
+    const dir = fly.from.o.clone().normalize().lerp(off.clone().normalize(), e).normalize();
+    const len = logLerp(fly.from.o.length(), off.length(), e);
+    camera.position.copy(controls.target).add(dir.multiplyScalar(len));
+    camera.lookAt(controls.target);
+    if (fly.t >= 1) { fly = null; controls.enabled = true; if (focus) lastFocusR = focus.cur.R; }
+  } else if (focus) {
+    // bám theo hành tinh đang xem, giữ nguyên góc nhìn; khi đổi tỷ lệ thì phóng theo
+    const off = camera.position.clone().sub(controls.target).multiplyScalar(focus.cur.R / lastFocusR);
+    controls.target.copy(focus.cur.pos); camera.position.copy(focus.cur.pos).add(off);
+    lastFocusR = focus.cur.R;
+  }
+  const R = focus ? focus.cur.R : 0;
+  controls.minDistance = focus ? R * 1.25 : (mode === 'real' ? 50 : mode === 'compare' ? 5 : 8);
+  controls.maxDistance = mode === 'real' ? 6e6 : mode === 'compare' ? 900 : 1600;
+  if (!fly) controls.update();
+  // dời khung hình khi bảng thông tin che một phần màn hình
+  const W = innerWidth, H = innerHeight, open = panelOpen();
+  const want = open ? (W >= 760 ? {x: 197, y: 0} : {x: 0, y: H * .29}) : {x: 0, y: 0};
+  shift.x = lerp(shift.x, want.x, Math.min(1, dt * 5)); shift.y = lerp(shift.y, want.y, Math.min(1, dt * 5));
+  camera.setViewOffset(W, H, shift.x, shift.y, W, H);
+  sky.position.copy(camera.position);
+}
+const shift = {x: 0, y: 0};
+
+/* ================= NHÃN TÊN ================= */
+const labelsEl = $('#labels');
+for (const id of ORDER) {
+  const el = document.createElement('div'); el.className = 'lb';
+  el.innerHTML = `<div><i class="dot" style="--c:${D[id].mau[1]}"></i><span class="nm">${D[id].ten}</span></div>`;
+  el.addEventListener('click', ev => { ev.stopPropagation(); select(id); });
+  labelsEl.appendChild(el); bodies[id].label = el;
+}
+const tmp = new V3();
+function screenOf(b) {
+  tmp.copy(b.cur.pos).project(camera);
+  const dist = camera.position.distanceTo(b.cur.pos);
+  const behind = tmp.z > 1 || dist < b.cur.R;
+  const rpx = b.cur.R / (dist * Math.tan(camera.fov / 2 * DEG)) * innerHeight / 2;
+  return {x: (tmp.x + 1) / 2 * innerWidth, y: (1 - tmp.y) / 2 * innerHeight, rpx, dist, behind};
+}
+function updateLabels() {
+  const cf = cmpFactor(), boxes = [];
+  const prio = ORDER.map(id => bodies[id]).sort((a, b) => (b === focus) - (a === focus) || b.r - a.r);
+  for (const b of prio) {
+    const s = b.scr = screenOf(b), el = b.label;
+    let hide = s.behind || (b === focus && s.rpx > 70);
+    const big = s.rpx > 7;
+    const x = s.x, y = big ? s.y + s.rpx + 14 : s.y + 10;
+    if (!hide) {
+      const bw = 34 + D[b.id].ten.length * 7.2, box = [x - bw / 2, y - 18, x + bw / 2, y + 16];
+      if (boxes.some(o => box[0] < o[2] && box[2] > o[0] && box[1] < o[3] && box[3] > o[1])) hide = true;
+      else boxes.push(box);
+    }
+    if (cf > .5 && b.id === 'moon' && focus !== b) hide = hide || false;
+    el.classList.toggle('hide', hide);
+    el.classList.toggle('big', big);
+    el.classList.toggle('sel', b === focus);
+    if (!hide) el.style.transform = `translate(${x.toFixed(1)}px,${(big ? y : s.y).toFixed(1)}px)`;
+  }
+}
+
+/* ================= CHẠM ĐỂ CHỌN ================= */
+let down = null;
+canvas.addEventListener('pointerdown', e => { down = {x: e.clientX, y: e.clientY, t: performance.now()}; if (fly && focus == null) { /* cho phép ngắt bay về toàn cảnh */ } });
+canvas.addEventListener('pointerup', e => {
+  if (!down) return;
+  const moved = Math.hypot(e.clientX - down.x, e.clientY - down.y), dt = performance.now() - down.t; down = null;
+  if (moved > 10 || dt > 600) return;
+  let best = null, bestScore = 1e9;
+  for (const id of ORDER) {
+    const s = bodies[id].scr; if (!s || s.behind) continue;
+    const d = Math.hypot(s.x - e.clientX, s.y - e.clientY), hitR = Math.max(s.rpx, 30);
+    if (d < hitR) { const score = d < s.rpx ? s.dist * 1e-9 : d; if (score < bestScore) { bestScore = score; best = id; } }
+  }
+  if (best) select(best);
+});
+
+/* ================= GIAO DIỆN ================= */
+const dock = $('#dock');
+const dockSize = id => id === 'sun' ? 40 : Math.round(clamp(12 + Math.sqrt(B[id].r / ER) * 8, 14, 38));
+for (const id of ORDER) {
+  const bt = document.createElement('button'); bt.dataset.id = id;
+  bt.innerHTML = `<div class="${ballCls(id)}" style="${ballStyle(id, dockSize(id))}"></div><span>${D[id].ten}</span>`;
+  bt.onclick = () => select(id);
+  dock.appendChild(bt);
+}
+const fmtNum = n => n.toLocaleString('vi-VN', {maximumFractionDigits: n < 10 ? 1 : 0});
+function planeTrip(id) {
+  if (id === 'earth') return 'Bay một vòng quanh Trái Đất mất khoảng 2 ngày';
+  const km = id === 'moon' ? B.moon.km : id === 'sun' ? AU : Math.abs(B[id].a - 1) * AU;
+  const h = km / 900;
+  const t = h < 24 * 400 ? `khoảng ${Math.round(h / 24)} ngày` : `khoảng ${fmtNum(Math.round(h / 8766))} năm`;
+  return `Đi máy bay từ Trái Đất tới ${D[id].ten}${id === 'sun' || id === 'moon' ? '' : ' (lúc gần nhất)'} mất ${t}`;
+}
+function sizeCompare(id) {
+  if (id === 'earth') return '';
+  const big = Math.max(B[id].r, ER), sc = 110 / big;
+  const a = Math.max(2, B[id].r * sc), e = Math.max(2, ER * sc);
+  const times = B[id].r > ER ? `to gấp ${fmtNum(B[id].r / ER)} lần` : `chỉ bằng ${fmtNum(B[id].r / ER)}`;
+  return `<h3>📐 So với Trái Đất</h3><div class="cmp">
+    <div><div class="${ballCls(id)}" style="${ballStyle(id, a)}"></div>${D[id].ten}</div>
+    <div><div class="${ballCls('earth')}" style="${ballStyle('earth', e)}"></div>Trái Đất</div></div>
+    <div class="cmp note">${D[id].ten} ${times} Trái Đất${id === 'sun' ? ' – Trái Đất chỉ là một chấm nhỏ xíu!' : ''}</div>`;
+}
+function fillPanel(id) {
+  const d = D[id];
+  $('#pball').className = ballCls(id); $('#pball').setAttribute('style', ballStyle(id, 58));
+  $('#pname').textContent = d.ten; $('#ptype').textContent = d.loai;
+  const i = ORDER.indexOf(id), prev = ORDER[(i + ORDER.length - 1) % ORDER.length], next = ORDER[(i + 1) % ORDER.length];
+  const kg = Math.round(20 * B[id].g);
+  $('#pbody').innerHTML = `
+    <div class="actions"><button class="main" id="listen">🔊 Nghe kể</button><button id="zoomout">🔭 Nhìn xa</button></div>
+    <h3>💡 Bé biết không?</h3>
+    <ul class="facts">${d.biet.map(t => `<li>${t}</li>`).join('')}</ul>
+    <h3>📋 Thông tin</h3>
+    <div class="stats">${d.so.map(([e, k, v], j) => `<div class="stat${j === 0 && d.so.length % 2 ? ' w' : ''}"><div class="e">${e}</div><div class="k">${k}</div><div class="v">${v}</div></div>`).join('')}
+      <div class="stat w"><div class="e">✈️</div><div class="v">${planeTrip(id)}</div></div>
+      <div class="stat w"><div class="e">🏋️</div><div class="v">Nếu bé nặng 20 kg ở Trái Đất, thì ở đây bé nặng như ${kg} kg${id === 'sun' ? ' (nhưng nóng quá, không đứng được đâu!)' : B[id].g > 1.5 ? ' – nặng trĩu!' : B[id].g < .5 ? ' – nhảy cao vèo vèo!' : ''}</div></div>
+    </div>
+    ${sizeCompare(id)}
+    <div class="nav"><button id="prev">◀ ${D[prev].ten}</button><button id="next">${D[next].ten} ▶</button></div>`;
+  $('#listen').onclick = () => say(id);
+  $('#zoomout').onclick = () => deselect();
+  $('#prev').onclick = () => select(prev);
+  $('#next').onclick = () => select(next);
+  $('#pbody').scrollTop = 0;
+}
+function select(id) {
+  const b = bodies[id];
+  if (focus === b && !fly) { say(id); return; }
+  focus = b; lastFocusR = b.cur.R;
+  startFly(b); whoosh();
+  fillPanel(id);
+  document.body.classList.add('open');
+  dock.querySelectorAll('button').forEach(x => x.classList.toggle('on', x.dataset.id === id));
+  dock.querySelector(`[data-id="${id}"]`).scrollIntoView({behavior: 'smooth', inline: 'center', block: 'nearest'});
+  hideHint();
+  say(id);
+}
+function deselect() {
+  focus = null; startFly(null);
+  document.body.classList.remove('open');
+  dock.querySelectorAll('button').forEach(x => x.classList.remove('on'));
+  stopVoice();
+}
+$('#close').onclick = deselect;
+$('#home').onclick = deselect;
+$('#mute').onclick = () => { muted = !muted; try { localStorage.setItem('hmt_mute', muted ? '1' : '0'); } catch (e) {} setMuteUI(); if (muted) stopVoice(); };
+
+let hintTimer;
+function showHint(text, ms = 7000) { const h = $('#hint'); h.textContent = text; h.classList.add('show'); clearTimeout(hintTimer); hintTimer = setTimeout(hideHint, ms); }
+function hideHint() { $('#hint').classList.remove('show'); }
+
+$('#seg').addEventListener('click', e => {
+  const m = e.target.closest('button')?.dataset.m;
+  if (!m || m === mode || morph) return;
+  document.querySelectorAll('#seg button').forEach(b => b.classList.toggle('on', b.dataset.m === m));
+  morph = {from: mode, to: m, t: 0}; mode = m;
+  if (!focus) startFly(null);
+  if (m === 'real') { showHint('📏 Đây là kích thước và khoảng cách THẬT. Các hành tinh ở rất xa nên chỉ như chấm nhỏ xíu! Bé chạm vào tên để bay tới xem.'); if (!focus) say('real'); }
+  else if (m === 'compare') { showHint('⚖️ Các hành tinh xếp hàng theo đúng kích thước thật. Bức tường lửa bên trái là một góc của Mặt Trời!'); if (!focus) say('compare'); }
+  else hideHint();
+});
+$('#time').addEventListener('click', e => {
+  const s = e.target.closest('button')?.dataset.s; if (s == null) return;
+  speed = +s;
+  document.querySelectorAll('#time button').forEach(b => b.classList.toggle('on', b.dataset.s === s));
+});
+let lastDay = '';
+function updateDate() {
+  const d = new Date(J2000 + simDays * 864e5);
+  const t = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+  if (t !== lastDay) { $('#date').textContent = '📅 ' + t; lastDay = t; }
+}
+$('#date').onclick = () => { simDays = (Date.now() - J2000) / 864e5; };
+
+/* ================= VÒNG LẶP ================= */
+function resize() {
+  renderer.setSize(innerWidth, innerHeight, false);
+  camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+}
+addEventListener('resize', resize); resize();
+
+let last = performance.now(), time = 0;
+function frame(now) {
+  step(Math.min(.1, (now - last) / 1000)); last = now;
+  requestAnimationFrame(frame);
+}
+function step(dt) {
+  time += dt;
+  simDays += speed * dt;
+  if (morph) { morph.t += dt / 1.8; if (morph.t >= 1) morph = null; }
+  update();
+  // tự quay quanh trục (giới hạn tốc độ cho dễ nhìn)
+  const maxW = Math.PI * 2 * .12;
+  for (const id of ORDER) {
+    const b = bodies[id], w = Math.PI * 2 * speed / B[id].rot;
+    b.mesh.rotation.y += clamp(w, -maxW, maxW) * dt + (speed === 0 ? 0 : 0);
+    if (b.clouds) b.clouds.rotation.y += clamp(w, -maxW, maxW) * dt * 1.12;
+  }
+  sunMat.uniforms.time.value = time;
+  stepCamera(dt);
+  renderer.render(scene, camera);
+  updateLabels();
+  updateDate();
+}
+
+/* ================= TẢI ================= */
+async function loadAll() {
+  const steps = ['sun', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'milky'];
+  const bar = $('#bar i');
+  const loader = new THREE.TextureLoader();
+  const net = url => new Promise((ok, no) => loader.load(url, t => { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; ok(t); }, undefined, no));
+  const BASE = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r160/examples/textures/planets/';
+  // ảnh vệ tinh thật của Trái Đất và Mặt Trăng (tải song song)
+  const earthP = Promise.all([net(BASE + 'earth_atmos_2048.jpg'), net(BASE + 'earth_normal_2048.jpg').catch(() => null), net(BASE + 'earth_clouds_1024.png').catch(() => null)])
+    .then(([map, normal, clouds]) => {
+      const m = bodies.earth.mesh.material; m.map = map; if (normal) { normal.colorSpace = THREE.NoColorSpace; m.normalMap = normal; m.normalScale.set(.8, .8); }
+      m.roughness = .85; m.needsUpdate = true;
+      if (clouds) {
+        const c = new THREE.Mesh(SPHERE, new THREE.MeshStandardMaterial({map: clouds, transparent: true, opacity: .9, depthWrite: false, roughness: 1}));
+        c.scale.setScalar(1.012); bodies.earth.tilt.add(c); bodies.earth.clouds = c;
+      }
+    }).catch(() => { bodies.earth.mesh.material.map = TEX.earth(); bodies.earth.mesh.material.needsUpdate = true; });
+  const moonP = net(BASE + 'moon_1024.jpg').then(t => { bodies.moon.mesh.material.map = t; bodies.moon.mesh.material.needsUpdate = true; })
+    .catch(() => { bodies.moon.mesh.material.map = TEX.moon(); bodies.moon.mesh.material.needsUpdate = true; });
+  for (let i = 0; i < steps.length; i++) {
+    await new Promise(r => setTimeout(r, 16));
+    const id = steps[i];
+    if (id === 'milky') makeMilky();
+    else if (id === 'sun') sunMat.uniforms.map.value = TEX.sun();
+    else { bodies[id].mesh.material.map = TEX[id](); bodies[id].mesh.material.needsUpdate = true; }
+    bar.style.width = ((i + 1) / (steps.length + 1) * 100) + '%';
+  }
+  await Promise.race([Promise.all([earthP, moonP]), new Promise(r => setTimeout(r, 8000))]);
+  bar.style.width = '100%';
+}
+
+// đặt camera ban đầu
+{ const ov = overview('easy'); controls.target.copy(ov.target); camera.position.copy(ov.target).add(ov.off); }
+update();
+requestAnimationFrame(frame);
+await loadAll();
+$('#msg').textContent = 'Chạm vào hành tinh để xem nhé!';
+$('#go').classList.add('ready');
+$('#go').onclick = () => {
+  $('#start').classList.add('gone');
+  // mở khoá âm thanh trên iPad bằng lần chạm này
+  try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); ac.resume(); } catch (e) {}
+  say('intro');
+  showHint('👆 Chạm vào một hành tinh hoặc tên của nó để bay tới xem. Dùng hai ngón tay để phóng to, thu nhỏ.', 8000);
+};
+// dùng khi kiểm thử: chạy nhanh n khung hình
+window.__hmt = {bodies, camera, controls, select, deselect, get mode() { return mode; }, tick: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) step(dt); }};
+</script>
+</body>
+</html>

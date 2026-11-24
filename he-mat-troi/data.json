@@ -1,0 +1,237 @@
+{
+"sun": {
+  "ten": "Mặt Trời", "loai": "Ngôi sao ở giữa Hệ Mặt Trời", "mau": ["#fff3b0", "#ffb300", "#e65100"],
+  "so": [
+    ["📏", "Đường kính", "1.392.700 km"],
+    ["⚖️", "So với Trái Đất", "to gấp 109 lần"],
+    ["🌡️", "Nhiệt độ bề mặt", "khoảng 5.500 °C"],
+    ["💡", "Ánh sáng tới Trái Đất", "mất 8 phút 20 giây"],
+    ["🎂", "Tuổi", "khoảng 4,6 tỷ năm"]
+  ],
+  "biet": [
+    "Mặt Trời chứa được khoảng 1,3 triệu Trái Đất bên trong.",
+    "Mặt Trời là một quả cầu khí khổng lồ, nóng rực và tự phát sáng.",
+    "Không bao giờ được nhìn thẳng vào Mặt Trời vì sẽ hỏng mắt!"
+  ],
+  "doc": [
+    "Đây là Mặt Trời.",
+    "Mặt Trời là một ngôi sao rất lớn và rất nóng, nằm ở chính giữa Hệ Mặt Trời.",
+    "Mặt Trời to đến mức chứa được khoảng một triệu ba trăm nghìn Trái Đất.",
+    "Ánh sáng Mặt Trời phải đi hơn tám phút mới tới được Trái Đất.",
+    "Không có Mặt Trời thì không có cây cối, con vật và cả chúng mình nữa.",
+    "Bé nhớ là không bao giờ được nhìn thẳng vào Mặt Trời nhé."
+  ]
+},
+"mercury": {
+  "ten": "Sao Thủy", "loai": "Hành tinh thứ 1 tính từ Mặt Trời", "mau": ["#d6d0c8", "#8c8680", "#4a4540"],
+  "so": [
+    ["📏", "Đường kính", "4.879 km"],
+    ["⚖️", "So với Trái Đất", "nhỏ hơn, chỉ bằng 0,38"],
+    ["☀️", "Cách Mặt Trời", "58 triệu km"],
+    ["🔄", "1 năm dài", "88 ngày"],
+    ["🌗", "1 ngày đêm dài", "176 ngày Trái Đất"],
+    ["🌡️", "Nhiệt độ", "430 °C ban ngày, −180 °C ban đêm"],
+    ["🌙", "Mặt trăng", "không có"]
+  ],
+  "biet": [
+    "Sao Thủy là hành tinh nhỏ nhất, chỉ to hơn Mặt Trăng một chút.",
+    "Sao Thủy chạy quanh Mặt Trời nhanh nhất trong tám hành tinh.",
+    "Bề mặt đầy hố tròn do thiên thạch đâm vào, trông rất giống Mặt Trăng."
+  ],
+  "doc": [
+    "Đây là Sao Thủy, hành tinh nhỏ nhất và ở gần Mặt Trời nhất.",
+    "Sao Thủy chạy quanh Mặt Trời rất nhanh, một năm ở đây chỉ dài tám mươi tám ngày.",
+    "Ban ngày nóng bỏng hơn bốn trăm độ, nhưng ban đêm lại lạnh cóng.",
+    "Bề mặt Sao Thủy đầy những hố tròn, giống như Mặt Trăng."
+  ]
+},
+"venus": {
+  "ten": "Sao Kim", "loai": "Hành tinh thứ 2 tính từ Mặt Trời", "mau": ["#fff0c2", "#e3bb76", "#a0703a"],
+  "so": [
+    ["📏", "Đường kính", "12.104 km"],
+    ["⚖️", "So với Trái Đất", "gần bằng Trái Đất"],
+    ["☀️", "Cách Mặt Trời", "108 triệu km"],
+    ["🔄", "1 năm dài", "225 ngày"],
+    ["🌗", "1 ngày đêm dài", "117 ngày Trái Đất"],
+    ["🌡️", "Nhiệt độ", "khoảng 465 °C"],
+    ["🌙", "Mặt trăng", "không có"]
+  ],
+  "biet": [
+    "Sao Kim là hành tinh nóng nhất, đủ nóng để làm chảy chì.",
+    "Sao Kim tự quay ngược, nên ở đó Mặt Trời mọc đằng tây.",
+    "Sao Kim là \"sao Mai\" lúc sáng sớm và \"sao Hôm\" lúc chiều tối."
+  ],
+  "doc": [
+    "Đây là Sao Kim, hành tinh nóng nhất.",
+    "Sao Kim còn nóng hơn cả Sao Thủy, vì lớp mây dày giữ nhiệt lại như một cái chăn.",
+    "Sao Kim to gần bằng Trái Đất.",
+    "Ở Sao Kim, Mặt Trời mọc ở đằng tây.",
+    "Lúc sáng sớm hay chiều tối, bé có thể thấy Sao Kim sáng lấp lánh trên trời. Ông bà mình gọi đó là sao Mai và sao Hôm."
+  ]
+},
+"earth": {
+  "ten": "Trái Đất", "loai": "Hành tinh thứ 3 – nhà của chúng mình", "mau": ["#bfe6ff", "#2f7fd8", "#1f5e2b"],
+  "so": [
+    ["📏", "Đường kính", "12.742 km"],
+    ["☀️", "Cách Mặt Trời", "150 triệu km"],
+    ["🔄", "1 năm dài", "365 ngày"],
+    ["🌗", "1 ngày đêm dài", "24 giờ"],
+    ["🌡️", "Nhiệt độ trung bình", "khoảng 15 °C"],
+    ["🌊", "Nước", "biển phủ 7 phần 10 bề mặt"],
+    ["🌙", "Mặt trăng", "1"]
+  ],
+  "biet": [
+    "Trái Đất là hành tinh duy nhất mà con người biết là có sự sống.",
+    "Trái Đất hơi nghiêng một chút, nhờ vậy mới có mùa hè và mùa đông.",
+    "Nhìn từ vũ trụ, Trái Đất là một hòn bi xanh rất đẹp."
+  ],
+  "doc": [
+    "Đây là Trái Đất, ngôi nhà của chúng mình.",
+    "Trái Đất là hành tinh duy nhất có sự sống mà con người biết.",
+    "Phần lớn Trái Đất được bao phủ bởi biển xanh.",
+    "Trái Đất tự quay một vòng hết một ngày, và đi một vòng quanh Mặt Trời hết một năm.",
+    "Trái Đất có một người bạn đồng hành, đó là Mặt Trăng."
+  ]
+},
+"moon": {
+  "ten": "Mặt Trăng", "loai": "Vệ tinh của Trái Đất", "mau": ["#f0f0f0", "#a8a8a8", "#555"],
+  "so": [
+    ["📏", "Đường kính", "3.474 km"],
+    ["⚖️", "So với Trái Đất", "bằng khoảng 1 phần 4"],
+    ["🌍", "Cách Trái Đất", "384.400 km"],
+    ["🔄", "Đi 1 vòng quanh Trái Đất", "27 ngày"],
+    ["🌡️", "Nhiệt độ", "120 °C ban ngày, −170 °C ban đêm"]
+  ],
+  "biet": [
+    "Mặt Trăng không tự sáng, nó phản chiếu ánh sáng Mặt Trời.",
+    "Mặt Trăng luôn quay một mặt về phía Trái Đất.",
+    "Năm 1969, con người lần đầu đặt chân lên Mặt Trăng."
+  ],
+  "doc": [
+    "Đây là Mặt Trăng, người bạn đồng hành của Trái Đất.",
+    "Mặt Trăng không tự phát sáng, mà phản chiếu ánh sáng của Mặt Trời.",
+    "Năm một nghìn chín trăm sáu mươi chín, các nhà du hành vũ trụ đã đặt chân lên Mặt Trăng.",
+    "Vì Mặt Trăng không có gió, dấu chân của họ vẫn còn ở đó đến bây giờ."
+  ]
+},
+"mars": {
+  "ten": "Sao Hỏa", "loai": "Hành tinh thứ 4 tính từ Mặt Trời", "mau": ["#ffb08a", "#c1440e", "#5e1d08"],
+  "so": [
+    ["📏", "Đường kính", "6.779 km"],
+    ["⚖️", "So với Trái Đất", "bằng khoảng một nửa"],
+    ["☀️", "Cách Mặt Trời", "228 triệu km"],
+    ["🔄", "1 năm dài", "687 ngày"],
+    ["🌗", "1 ngày đêm dài", "24 giờ 40 phút"],
+    ["🌡️", "Nhiệt độ trung bình", "khoảng −65 °C"],
+    ["🌙", "Mặt trăng", "2 (Phobos và Deimos)"]
+  ],
+  "biet": [
+    "Sao Hỏa có màu đỏ vì đất đá ở đó có nhiều gỉ sắt.",
+    "Núi lửa Olympus trên Sao Hỏa cao gần gấp 3 lần đỉnh Everest.",
+    "Xe rô bốt của con người đang chạy trên Sao Hỏa để tìm hiểu."
+  ],
+  "doc": [
+    "Đây là Sao Hỏa, hành tinh màu đỏ.",
+    "Sao Hỏa có màu đỏ vì đất đá ở đây có nhiều gỉ sắt.",
+    "Sao Hỏa có ngọn núi lửa cao nhất Hệ Mặt Trời, cao gần gấp ba lần ngọn núi cao nhất Trái Đất.",
+    "Hiện nay có những chiếc xe rô bốt đang chạy trên Sao Hỏa để khám phá."
+  ]
+},
+"jupiter": {
+  "ten": "Sao Mộc", "loai": "Hành tinh thứ 5 – to nhất", "mau": ["#f5e3c8", "#c99a6b", "#7a4b2a"],
+  "so": [
+    ["📏", "Đường kính", "139.820 km"],
+    ["⚖️", "So với Trái Đất", "to gấp 11 lần"],
+    ["☀️", "Cách Mặt Trời", "778 triệu km"],
+    ["🔄", "1 năm dài", "gần 12 năm Trái Đất"],
+    ["🌗", "1 ngày đêm dài", "chưa tới 10 giờ"],
+    ["🌡️", "Nhiệt độ", "khoảng −110 °C"],
+    ["🌙", "Mặt trăng", "hơn 90"]
+  ],
+  "biet": [
+    "Sao Mộc chứa được hơn 1.300 Trái Đất bên trong.",
+    "Vết Đỏ Lớn là một cơn bão to hơn cả Trái Đất.",
+    "Sao Mộc quay nhanh nhất, một ngày ở đó chưa tới 10 tiếng."
+  ],
+  "doc": [
+    "Đây là Sao Mộc, hành tinh to nhất Hệ Mặt Trời.",
+    "Sao Mộc to đến mức chứa được hơn một nghìn ba trăm Trái Đất.",
+    "Sao Mộc làm bằng khí, nên không có mặt đất để đứng.",
+    "Vết đỏ lớn trên Sao Mộc là một cơn bão khổng lồ, to hơn cả Trái Đất, đã thổi suốt hàng trăm năm."
+  ]
+},
+"saturn": {
+  "ten": "Sao Thổ", "loai": "Hành tinh thứ 6 – có vành đai đẹp nhất", "mau": ["#fbefc9", "#e0c48a", "#8a6a3a"],
+  "so": [
+    ["📏", "Đường kính", "116.460 km"],
+    ["⚖️", "So với Trái Đất", "to gấp 9 lần"],
+    ["☀️", "Cách Mặt Trời", "1,4 tỷ km"],
+    ["🔄", "1 năm dài", "29 năm Trái Đất"],
+    ["🌗", "1 ngày đêm dài", "khoảng 10 giờ 30 phút"],
+    ["🌡️", "Nhiệt độ", "khoảng −140 °C"],
+    ["🌙", "Mặt trăng", "hơn 270 – nhiều nhất!"]
+  ],
+  "biet": [
+    "Vành đai Sao Thổ làm từ hàng tỉ cục băng và đá.",
+    "Sao Thổ nhẹ đến mức có thể nổi trên một bồn nước khổng lồ.",
+    "Sao Thổ có nhiều mặt trăng nhất Hệ Mặt Trời."
+  ],
+  "doc": [
+    "Đây là Sao Thổ, hành tinh có vành đai đẹp nhất.",
+    "Vành đai của Sao Thổ làm từ hàng tỉ cục băng và đá. Có cục nhỏ như hạt cát, có cục to như ngôi nhà.",
+    "Sao Thổ rất nhẹ. Nếu có một bồn nước thật khổng lồ, Sao Thổ có thể nổi lên được.",
+    "Sao Thổ có nhiều mặt trăng nhất Hệ Mặt Trời."
+  ]
+},
+"uranus": {
+  "ten": "Sao Thiên Vương", "loai": "Hành tinh thứ 7 – nằm nghiêng", "mau": ["#e2fbff", "#93dbe4", "#3f8f9a"],
+  "so": [
+    ["📏", "Đường kính", "50.724 km"],
+    ["⚖️", "So với Trái Đất", "to gấp 4 lần"],
+    ["☀️", "Cách Mặt Trời", "2,9 tỷ km"],
+    ["🔄", "1 năm dài", "84 năm Trái Đất"],
+    ["🌗", "1 ngày đêm dài", "khoảng 17 giờ"],
+    ["🌡️", "Nhiệt độ", "khoảng −195 °C"],
+    ["🌙", "Mặt trăng", "29"]
+  ],
+  "biet": [
+    "Sao Thiên Vương nằm nghiêng, lăn quanh Mặt Trời như quả bóng.",
+    "Nó có màu xanh ngọc nhờ một loại khí tên là mê-tan.",
+    "Mỗi cực của nó có 42 năm toàn ban ngày rồi 42 năm toàn ban đêm."
+  ],
+  "doc": [
+    "Đây là Sao Thiên Vương, hành tinh màu xanh ngọc.",
+    "Sao Thiên Vương nằm nghiêng hẳn sang một bên, lăn quanh Mặt Trời như một quả bóng.",
+    "Ở đây lạnh khủng khiếp.",
+    "Phải mất tám mươi tư năm, Sao Thiên Vương mới đi hết một vòng quanh Mặt Trời."
+  ]
+},
+"neptune": {
+  "ten": "Sao Hải Vương", "loai": "Hành tinh thứ 8 – xa nhất", "mau": ["#cfe0ff", "#3d5ef0", "#16246e"],
+  "so": [
+    ["📏", "Đường kính", "49.244 km"],
+    ["⚖️", "So với Trái Đất", "to gấp gần 4 lần"],
+    ["☀️", "Cách Mặt Trời", "4,5 tỷ km"],
+    ["🔄", "1 năm dài", "165 năm Trái Đất"],
+    ["🌗", "1 ngày đêm dài", "khoảng 16 giờ"],
+    ["🌡️", "Nhiệt độ", "khoảng −200 °C"],
+    ["🌙", "Mặt trăng", "16"]
+  ],
+  "biet": [
+    "Sao Hải Vương có gió mạnh nhất, nhanh hơn cả máy bay.",
+    "Người ta tìm ra nó nhờ làm toán trước rồi mới nhìn thấy.",
+    "Từ khi được tìm ra năm 1846, nó mới đi được hơn một vòng quanh Mặt Trời."
+  ],
+  "doc": [
+    "Đây là Sao Hải Vương, hành tinh xa Mặt Trời nhất.",
+    "Sao Hải Vương có màu xanh dương đậm, và có những cơn gió mạnh nhất Hệ Mặt Trời, nhanh hơn cả máy bay.",
+    "Ở đây vừa lạnh vừa tối lắm.",
+    "Phải mất một trăm sáu mươi lăm năm, Sao Hải Vương mới đi hết một vòng quanh Mặt Trời."
+  ]
+},
+"_cau": {
+  "intro": "Chào bé! Cùng khám phá Hệ Mặt Trời nhé. Bé chạm vào một hành tinh để xem nó nhé.",
+  "real": "Đây là kích thước và khoảng cách thật. Các hành tinh ở rất xa Mặt Trời, nên nhìn chỉ như những chấm nhỏ xíu.",
+  "compare": "Đây là các hành tinh xếp cạnh nhau theo đúng kích thước. Bên trái là một góc của Mặt Trời khổng lồ."
+}
+}
