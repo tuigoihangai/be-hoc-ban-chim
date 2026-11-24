@@ -127,6 +127,7 @@ h3{font-family:'Baloo 2';font-size:18px;margin:16px 0 8px;color:var(--accent)}
 #start .box{text-align:center;padding:24px}
 #start h1{font-family:'Baloo 2';font-weight:800;font-size:clamp(34px,7vw,64px);margin:10px 0 4px;background:linear-gradient(180deg,#fff,#ffd36a);-webkit-background-clip:text;background-clip:text;color:transparent}
 #start p{color:var(--dim);margin:0 0 26px;font-size:16px}
+#start p.hi{font-family:'Baloo 2';font-weight:800;font-size:clamp(22px,4vw,30px);color:#ffd36a;margin:0 0 6px}
 #start .orb{width:120px;height:120px;margin:0 auto;position:relative;animation:spin 14s linear infinite}
 #start .orb .ball{position:absolute}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -181,8 +182,9 @@ h3{font-family:'Baloo 2';font-size:18px;margin:16px 0 8px;color:var(--accent)}
   <div class="box">
     <div class="orb" id="orb"></div>
     <h1>Khám phá Hệ Mặt Trời</h1>
+    <p class="hi">👦 Haha &amp; Hihi 👧</p>
     <p id="msg">Đang chuẩn bị các hành tinh…</p>
-    <button id="go">🚀 Bắt đầu</button>
+    <button id="go">🚀 Lên tàu vũ trụ</button>
     <div id="bar"><i></i></div>
     <div id="err"></div>
   </div>
@@ -1004,14 +1006,14 @@ async function loadAll() {
 update();
 requestAnimationFrame(frame);
 await loadAll();
-$('#msg').textContent = 'Chạm vào hành tinh để xem nhé!';
+$('#msg').textContent = 'Mời Haha và Hihi lên tàu đi tham quan Hệ Mặt Trời!';
 $('#go').classList.add('ready');
 $('#go').onclick = () => {
   $('#start').classList.add('gone');
   // mở khoá âm thanh trên iPad bằng lần chạm này
   try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); ac.resume(); } catch (e) {}
   say('intro');
-  showHint('👆 Chạm vào một hành tinh hoặc tên của nó để bay tới xem. Dùng hai ngón tay để phóng to, thu nhỏ.', 8000);
+  showHint('👋 Chào Haha và Hihi! Chạm vào một hành tinh hoặc tên của nó để bay tới xem. Dùng hai ngón tay để phóng to, thu nhỏ.', 12000);
 };
 // dùng khi kiểm thử: chạy nhanh n khung hình
 window.__hmt = {bodies, camera, controls, select, deselect, get mode() { return mode; }, tick: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) step(dt); }};

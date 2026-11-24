@@ -6,7 +6,7 @@ Dùng:  python -I he-mat-troi/tools/make_audio.py        (tạo file còn thiế
 Đọc data.json: mỗi thiên thể có mảng "doc" (các câu đọc) -> audio/<id>.mp3 (ghép các câu lại).
 Mục "_cau" là các câu lẻ -> audio/<khoá>.mp3.
 """
-import json, os, sys, time, urllib.parse, urllib.request
+import json, os, re, sys, time, urllib.parse, urllib.request
 sys.stdout.reconfigure(encoding="utf-8")
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -29,6 +29,9 @@ def tts(text):
     raise SystemExit('KHÔNG TẠO ĐƯỢC: ' + text)
 
 
+SAY_FIX = {'Haha': 'Ha Ha', 'Hihi': 'Hi Hi'}   # viết tách cho giọng đọc tự nhiên
+
+
 def main():
     redo = '--all' in sys.argv
     data = json.load(open(os.path.join(ROOT, 'data.json'), encoding='utf-8'))
@@ -41,7 +44,9 @@ def main():
         print('tạo', name)
         out = b''
         for s in sentences:
-            out += tts(s)
+            for a, b in SAY_FIX.items(): s = s.replace(a, b)
+            for part in re.split(r'(?<=[.!?])\s+', s):   # Google chỉ đọc tối đa ~200 ký tự mỗi lần
+                out += tts(part)
             time.sleep(0.4)
         open(path, 'wb').write(out)
     print('xong')
